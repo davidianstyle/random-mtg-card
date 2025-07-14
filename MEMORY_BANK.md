@@ -18,6 +18,8 @@
 
 **Trigger**: Push to `main` branch
 
+**Action**: `googleapis/release-please-action@v4` (updated from deprecated `google-github-actions/release-please-action`)
+
 **Two-Stage Process**:
 1. **Release Please Job**: 
    - Creates/updates release PR with changelog
