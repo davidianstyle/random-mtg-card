@@ -43,7 +43,7 @@ jobs:
           - os: windows-latest
             build-script: ./scripts/build_windows.bat
             artifact-name: mtg-card-display-windows
-            artifact-path: build/windows/x64/runner/Release/
+            artifact-path: build/windows/runner/Release/
 
     steps:
       - name: Checkout
@@ -89,8 +89,8 @@ jobs:
       - name: Create archive (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          cd build/windows/x64/runner/Release/
-          7z a ../../../../../mtg-card-display-windows.zip .
+          cd build/windows/runner/Release/
+          7z a ../../../../mtg-card-display-windows.zip .
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
