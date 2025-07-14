@@ -3,7 +3,7 @@ description: >-
   Cross-platform MTG card display app with comprehensive filtering, favorites,
   and gesture navigation
 publish_to: none
-version: 1.0.0
+version: 1.0.1
 environment:
   sdk: '>=3.0.0 <4.0.0'
 dependencies:
@@ -49,13 +49,3 @@ platforms:
     plugins:
       window_manager:
         path: packages/window_manager
-  
-  # Custom fonts (optional)
-  # fonts:
-  #   - family: Roboto
-  #     fonts:
-  #       - asset: fonts/Roboto-Regular.ttf
-  #       - asset: fonts/Roboto-Bold.ttf
-  #         weight: 700
-  
-# Platform-specific configuration is handled by the window_manager plugin automatically 
