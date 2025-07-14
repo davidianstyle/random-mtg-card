@@ -20,6 +20,11 @@
 
 **Action**: `googleapis/release-please-action@v4` (updated from deprecated `google-github-actions/release-please-action`)
 
+**Permissions Required**:
+- `contents: write` - Create releases and tags
+- `pull-requests: write` - Create and update release PRs  
+- `issues: write` - Create and manage labels (autorelease: pending, etc.)
+
 **Two-Stage Process**:
 1. **Release Please Job**: 
    - Creates/updates release PR with changelog
@@ -187,6 +192,11 @@ feat!: redesign settings configuration format
 - **Changelog formatting**: Verify conventional commit format
 - **Build failures**: Check platform-specific dependencies
 - **Invalid previous_tag parameter**: Manifest version doesn't match existing git tags - reset manifest to `0.0.0` for new repos
+- **"GitHub Actions is not permitted to create or approve pull requests"**: Repository settings need to allow Actions to create PRs
+  - Go to Settings → Actions → General → Workflow permissions
+  - Enable "Allow GitHub Actions to create and approve pull requests"
+- **"You do not have permission to create labels on this repository"**: Workflow needs `issues: write` permission
+  - Add `issues: write` to the permissions section in the workflow file
 
 ### Debug Commands
 ```bash
