@@ -481,7 +481,7 @@ void main() {
 
         // Assert
         expect(json['type'], equals('search'));
-        expect(json['totalCards'], equals(100));
+        expect(json['total_cards'], equals(100));
         expect(json['has_more'], isTrue);
         expect(json['next_page'],
             equals('https://api.scryfall.com/cards/search?page=2'));

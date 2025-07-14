@@ -214,7 +214,7 @@ void main() {
         expect(filterConfig['enabled'], isA<bool>());
         expect(filterConfig['sets'], isA<List>());
         expect(filterConfig['colors'], isA<List>());
-        expect(filterConfig['types'], isA<List>());
+        expect(filterConfig['card_types'], isA<List>());
         expect(filterConfig['rarity'], isA<List>());
         expect(filterConfig['format'], isA<String>());
       });

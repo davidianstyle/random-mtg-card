@@ -141,8 +141,9 @@ class ImageUris {
 
 @JsonSerializable()
 class ScryfallResponse {
-  final MTGCard? object;
+  final String? object;
   final String? type;
+  @JsonKey(name: 'total_cards')
   final int? totalCards;
   final List<MTGCard>? data;
 

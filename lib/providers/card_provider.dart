@@ -10,7 +10,7 @@ class CardProvider extends ChangeNotifier {
 
   MTGCard? _currentCard;
   final List<MTGCard> _cardHistory = [];
-  int _currentIndex = -1;
+  int _currentIndex = 0;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -131,7 +131,8 @@ class CardProvider extends ChangeNotifier {
   // Clear history
   void clearHistory() {
     _cardHistory.clear();
-    _currentIndex = -1;
+    _currentCard = null;
+    _currentIndex = 0;
     notifyListeners();
   }
 
@@ -213,6 +214,12 @@ class CardProvider extends ChangeNotifier {
   void setCurrentCard(MTGCard? card) {
     if (card != null) {
       _setCurrentCard(card);
+    } else {
+      // Handle null card by clearing history and resetting index
+      _currentCard = null;
+      _cardHistory.clear();
+      _currentIndex = 0;
+      notifyListeners();
     }
   }
 

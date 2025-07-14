@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:random_mtg_card/models/mtg_card.dart';
 import 'package:random_mtg_card/services/scryfall_service.dart';
 import 'package:random_mtg_card/services/config_service.dart';
@@ -8,6 +9,12 @@ void main() {
     late ScryfallService service;
 
     setUpAll(() async {
+      // Initialize Flutter binding
+      TestWidgetsFlutterBinding.ensureInitialized();
+      
+      // Set up SharedPreferences mock
+      SharedPreferences.setMockInitialValues({});
+      
       // Initialize ConfigService before running tests
       await ConfigService.initialize();
     });
