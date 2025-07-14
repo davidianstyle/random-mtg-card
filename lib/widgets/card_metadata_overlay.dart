@@ -4,7 +4,7 @@ import '../models/mtg_card.dart';
 
 class CardMetadataOverlay extends StatelessWidget {
   final MTGCard card;
-  
+
   const CardMetadataOverlay({
     super.key,
     required this.card,
@@ -50,9 +50,9 @@ class CardMetadataOverlay extends StatelessWidget {
                 ),
             ],
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Type line
           Text(
             card.typeLine,
@@ -61,9 +61,9 @@ class CardMetadataOverlay extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Set info and rarity
           Row(
             children: [
@@ -93,7 +93,7 @@ class CardMetadataOverlay extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // Power/Toughness for creatures
           if (card.powerToughness != null) ...[
             const SizedBox(height: 8),
@@ -117,7 +117,7 @@ class CardMetadataOverlay extends StatelessWidget {
               ],
             ),
           ],
-          
+
           // Artist
           if (card.artist != null) ...[
             const SizedBox(height: 8),
@@ -159,4 +159,4 @@ class CardMetadataOverlay extends StatelessWidget {
         return Colors.grey[600]!;
     }
   }
-} 
+}

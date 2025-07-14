@@ -394,7 +394,8 @@ void main() {
         expect(provider.favoriteCardIds, isEmpty);
 
         // Act & Assert
-        expect(() async => await provider.removeFavorite('non-existent'), returnsNormally);
+        expect(() async => await provider.removeFavorite('non-existent'),
+            returnsNormally);
         expect(provider.favoriteCardIds, isEmpty);
       });
 
@@ -422,4 +423,4 @@ void main() {
       });
     });
   });
-} 
+}

@@ -322,14 +322,16 @@ void main() {
 
       test('should maintain history order', () {
         // Arrange
-        final cards = List.generate(5, (i) => MTGCard(
-          id: 'test-card-$i',
-          name: 'Test Card $i',
-          typeLine: 'Instant',
-          set: 'test',
-          setName: 'Test Set',
-          rarity: 'common',
-        ));
+        final cards = List.generate(
+            5,
+            (i) => MTGCard(
+                  id: 'test-card-$i',
+                  name: 'Test Card $i',
+                  typeLine: 'Instant',
+                  set: 'test',
+                  setName: 'Test Set',
+                  rarity: 'common',
+                ));
 
         // Act
         for (final card in cards) {
@@ -532,14 +534,16 @@ void main() {
 
       test('should handle rapid navigation changes', () {
         // Arrange
-        final cards = List.generate(5, (i) => MTGCard(
-          id: 'test-card-$i',
-          name: 'Test Card $i',
-          typeLine: 'Instant',
-          set: 'test',
-          setName: 'Test Set',
-          rarity: 'common',
-        ));
+        final cards = List.generate(
+            5,
+            (i) => MTGCard(
+                  id: 'test-card-$i',
+                  name: 'Test Card $i',
+                  typeLine: 'Instant',
+                  set: 'test',
+                  setName: 'Test Set',
+                  rarity: 'common',
+                ));
 
         for (final card in cards) {
           provider.setCurrentCard(card);
@@ -572,4 +576,4 @@ void main() {
       });
     });
   });
-} 
+}

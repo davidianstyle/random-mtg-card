@@ -1,31 +1,19 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
-import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:random_mtg_card/models/mtg_card.dart';
 import 'package:random_mtg_card/services/scryfall_service.dart';
 import 'package:random_mtg_card/services/config_service.dart';
 
 void main() {
   group('ScryfallService', () {
-    late HttpMockAdapter mockAdapter;
-    late http.Client mockClient;
     late ScryfallService service;
-    
+
     setUpAll(() async {
       // Initialize ConfigService before running tests
       await ConfigService.initialize();
     });
-    
-    setUp(() {
-      mockAdapter = HttpMockAdapter();
-      mockClient = http.Client();
-      service = ScryfallService.instance;
-    });
 
-    tearDown(() {
-      mockAdapter.reset();
+    setUp(() {
+      service = ScryfallService.instance;
     });
 
     group('getRandomCard', () {
@@ -60,10 +48,10 @@ void main() {
         // Note: This test depends on actual HTTP calls since the service is a singleton
         // In a real implementation, we would need to modify the service to accept a custom client
         // For now, we'll test the public interface
-        
+
         // This test would need to be modified to work with the actual service
         // or the service would need to be refactored to accept dependency injection
-        
+
         expect(service, isA<ScryfallService>());
         expect(service.getRandomCard, isA<Function>());
       });
@@ -71,17 +59,17 @@ void main() {
       test('should handle rate limiting between requests', () async {
         // Test that consecutive calls are rate limited
         final start = DateTime.now();
-        
+
         // These calls will actually hit the API, so we test the rate limiting logic
         // In a more controlled test, we would mock the HTTP client
-        
+
         // For now, just test that the method exists and returns the right type
         final result = await service.getRandomCard();
         expect(result, isA<MTGCard?>());
-        
+
         final end = DateTime.now();
         final elapsed = end.difference(start);
-        
+
         // The rate limiting should be handled internally
         expect(elapsed.inMilliseconds, greaterThanOrEqualTo(0));
       });
@@ -114,7 +102,8 @@ void main() {
 
       test('should handle search with rarity filters', () async {
         // Test filtering by rarity
-        final result = await service.searchCards(rarity: ['common', 'uncommon']);
+        final result =
+            await service.searchCards(rarity: ['common', 'uncommon']);
         expect(result, isA<List<MTGCard>>());
       });
 
@@ -186,11 +175,12 @@ void main() {
       test('should handle network errors gracefully', () async {
         // Test that network errors are handled gracefully
         // The service should return null or empty lists rather than throwing
-        
+
         // This would require mocking network conditions
         // For now, we just test that the methods don't throw
         expect(() async => await service.getRandomCard(), returnsNormally);
-        expect(() async => await service.searchCards(query: 'test'), returnsNormally);
+        expect(() async => await service.searchCards(query: 'test'),
+            returnsNormally);
         expect(() async => await service.getCard('test-id'), returnsNormally);
         expect(() async => await service.getSets(), returnsNormally);
       });
@@ -198,14 +188,14 @@ void main() {
       test('should handle invalid JSON responses', () async {
         // Test that invalid JSON responses are handled
         // The service should return null or empty lists
-        
+
         expect(() async => await service.getRandomCard(), returnsNormally);
       });
 
       test('should handle HTTP error status codes', () async {
         // Test that HTTP errors are handled gracefully
         // The service should return null or empty lists
-        
+
         expect(() async => await service.getRandomCard(), returnsNormally);
       });
     });
@@ -214,14 +204,14 @@ void main() {
       test('should respect rate limits between requests', () async {
         // Test that the service respects rate limits
         final start = DateTime.now();
-        
+
         // Make multiple requests to test rate limiting
         await service.getRandomCard();
         await service.getRandomCard();
-        
+
         final end = DateTime.now();
         final elapsed = end.difference(start);
-        
+
         // Should have waited at least 100ms between requests
         expect(elapsed.inMilliseconds, greaterThanOrEqualTo(100));
       });
@@ -231,18 +221,18 @@ void main() {
       test('should use configuration settings', () async {
         // Test that the service uses configuration settings
         // This would test integration with ConfigService
-        
+
         // The service should read from ConfigService for:
         // - API base URL
         // - API timeout
         // - Filter settings
-        
+
         expect(service, isA<ScryfallService>());
-        
+
         // Test that methods work with config
         final result = await service.getRandomCard();
         expect(result, isA<MTGCard?>());
       });
     });
   });
-} 
+}

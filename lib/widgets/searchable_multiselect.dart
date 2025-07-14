@@ -10,7 +10,7 @@ class SearchableMultiSelect extends StatefulWidget {
   final String? placeholder;
   final Widget? leading;
   final int? maxHeight;
-  
+
   const SearchableMultiSelect({
     super.key,
     required this.title,
@@ -50,8 +50,8 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
       final query = _searchController.text.toLowerCase();
       _filteredOptions = widget.options.where((option) {
         return option.label.toLowerCase().contains(query) ||
-               option.value.toLowerCase().contains(query) ||
-               (option.description?.toLowerCase().contains(query) ?? false);
+            option.value.toLowerCase().contains(query) ||
+            (option.description?.toLowerCase().contains(query) ?? false);
       }).toList();
     });
   }
@@ -121,11 +121,11 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
               ],
             ),
           ),
-          
+
           // Expandable content
           if (_isExpanded) ...[
             const Divider(color: Colors.white24),
-            
+
             // Search field
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -133,7 +133,8 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                 controller: _searchController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: widget.placeholder ?? 'Search ${widget.title.toLowerCase()}...',
+                  hintText: widget.placeholder ??
+                      'Search ${widget.title.toLowerCase()}...',
                   hintStyle: const TextStyle(color: Colors.white54),
                   prefixIcon: const Icon(Icons.search, color: Colors.white70),
                   suffixIcon: _searchController.text.isNotEmpty
@@ -159,7 +160,7 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                 ),
               ),
             ),
-            
+
             // Select all / Clear all buttons
             if (_filteredOptions.isNotEmpty)
               Padding(
@@ -168,17 +169,19 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                   children: [
                     TextButton(
                       onPressed: _selectAll,
-                      child: const Text('Select All', style: TextStyle(color: Colors.blue)),
+                      child: const Text('Select All',
+                          style: TextStyle(color: Colors.blue)),
                     ),
                     const SizedBox(width: 16),
                     TextButton(
                       onPressed: _clearAll,
-                      child: const Text('Clear All', style: TextStyle(color: Colors.red)),
+                      child: const Text('Clear All',
+                          style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),
               ),
-            
+
             // Options list
             if (widget.isLoading)
               const Padding(
@@ -204,8 +207,9 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                   itemCount: _filteredOptions.length,
                   itemBuilder: (context, index) {
                     final option = _filteredOptions[index];
-                    final isSelected = widget.selectedValues.contains(option.value);
-                    
+                    final isSelected =
+                        widget.selectedValues.contains(option.value);
+
                     return CheckboxListTile(
                       value: isSelected,
                       onChanged: (bool? value) {
@@ -215,13 +219,15 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                         option.label,
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.white70,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                       subtitle: option.description != null
                           ? Text(
                               option.description!,
-                              style: const TextStyle(color: Colors.white54, fontSize: 12),
+                              style: const TextStyle(
+                                  color: Colors.white54, fontSize: 12),
                             )
                           : null,
                       activeColor: Colors.blue,
@@ -244,7 +250,7 @@ class SelectedItemsChips extends StatelessWidget {
   final List<FilterOption> options;
   final Function(String) onRemove;
   final String? emptyText;
-  
+
   const SelectedItemsChips({
     super.key,
     required this.selectedValues,
@@ -270,7 +276,7 @@ class SelectedItemsChips extends StatelessWidget {
           (opt) => opt.value == value,
           orElse: () => FilterOption(value: value, label: value),
         );
-        
+
         return Chip(
           label: Text(
             option.label,
@@ -283,4 +289,4 @@ class SelectedItemsChips extends StatelessWidget {
       }).toList(),
     );
   }
-} 
+}

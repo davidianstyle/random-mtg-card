@@ -27,7 +27,8 @@ void main() {
       );
     });
 
-    testWidgets('should render card with image when card is provided', (WidgetTester tester) async {
+    testWidgets('should render card with image when card is provided',
+        (WidgetTester tester) async {
       // Arrange
       await tester.pumpWidget(
         MaterialApp(
@@ -45,7 +46,8 @@ void main() {
       expect(find.byType(CachedNetworkImage), findsOneWidget);
     });
 
-    testWidgets('should render placeholder when no card is provided', (WidgetTester tester) async {
+    testWidgets('should render placeholder when no card is provided',
+        (WidgetTester tester) async {
       // Arrange
       await tester.pumpWidget(
         const MaterialApp(
@@ -64,7 +66,8 @@ void main() {
       expect(find.text('No card to display'), findsOneWidget);
     });
 
-    testWidgets('should render error widget when card has no image', (WidgetTester tester) async {
+    testWidgets('should render error widget when card has no image',
+        (WidgetTester tester) async {
       // Arrange
       final cardWithoutImage = MTGCard(
         id: 'test-card-2',
@@ -112,7 +115,8 @@ void main() {
       expect(cardWidget.constraints?.maxHeight, equals(756.0));
     });
 
-    testWidgets('should render with correct styling', (WidgetTester tester) async {
+    testWidgets('should render with correct styling',
+        (WidgetTester tester) async {
       // Arrange
       await tester.pumpWidget(
         MaterialApp(
@@ -132,7 +136,8 @@ void main() {
       expect(decoration?.boxShadow, isNotNull);
     });
 
-    testWidgets('should handle image loading errors gracefully', (WidgetTester tester) async {
+    testWidgets('should handle image loading errors gracefully',
+        (WidgetTester tester) async {
       // Arrange
       final cardWithBadImage = MTGCard(
         id: 'test-card-3',
@@ -163,7 +168,8 @@ void main() {
       // The error widget should be displayed by CachedNetworkImage
     });
 
-    testWidgets('should display loading indicator', (WidgetTester tester) async {
+    testWidgets('should display loading indicator',
+        (WidgetTester tester) async {
       // Arrange
       await tester.pumpWidget(
         MaterialApp(
@@ -180,10 +186,11 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('should be responsive to different screen sizes', (WidgetTester tester) async {
+    testWidgets('should be responsive to different screen sizes',
+        (WidgetTester tester) async {
       // Arrange
       await tester.binding.setSurfaceSize(const Size(400, 600));
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -214,14 +221,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      final cachedImage = tester.widget<CachedNetworkImage>(find.byType(CachedNetworkImage));
+      final cachedImage =
+          tester.widget<CachedNetworkImage>(find.byType(CachedNetworkImage));
       expect(cachedImage.fit, equals(BoxFit.contain));
     });
 
     testWidgets('should handle tap gestures', (WidgetTester tester) async {
       // Arrange
       bool tapDetected = false;
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -241,14 +249,14 @@ void main() {
       expect(tapDetected, isTrue);
     });
 
-    testWidgets('should display card information in debug mode', (WidgetTester tester) async {
+    testWidgets('should display card information in debug mode',
+        (WidgetTester tester) async {
       // Arrange
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CardWidget(
               card: testCard,
-              showDebugInfo: true,
             ),
           ),
         ),
@@ -262,14 +270,14 @@ void main() {
       expect(find.text('Instant'), findsOneWidget);
     });
 
-    testWidgets('should not display card information in normal mode', (WidgetTester tester) async {
+    testWidgets('should not display card information in normal mode',
+        (WidgetTester tester) async {
       // Arrange
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: CardWidget(
               card: testCard,
-              showDebugInfo: false,
             ),
           ),
         ),
@@ -283,4 +291,4 @@ void main() {
       expect(find.text('Instant'), findsNothing);
     });
   });
-} 
+}

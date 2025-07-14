@@ -24,7 +24,7 @@ void main() {
         expect(ConfigService.instance, isA<ConfigService>());
         final config = ConfigService.instance.config;
         expect(config, isA<Map<String, dynamic>>());
-        
+
         // Check default values
         expect(config['display']['fullscreen'], equals(true));
         expect(config['display']['resolution'], equals([600, 1024]));
@@ -105,7 +105,7 @@ void main() {
         // Arrange
         await ConfigService.initialize();
         final service = ConfigService.instance;
-        
+
         final newConfig = {
           'display': {
             'fullscreen': false,
@@ -125,7 +125,7 @@ void main() {
         final prefs = await SharedPreferences.getInstance();
         final savedJson = prefs.getString('app_config');
         expect(savedJson, isNotNull);
-        
+
         final savedConfig = jsonDecode(savedJson!);
         expect(savedConfig['display']['fullscreen'], equals(false));
         expect(savedConfig['display']['resolution'], equals([1920, 1080]));
@@ -140,10 +140,10 @@ void main() {
 
         // Act & Assert
         expect(() async => await ConfigService.initialize(), returnsNormally);
-        
+
         await ConfigService.initialize();
         final config = ConfigService.instance.config;
-        
+
         // Should fall back to defaults
         expect(config['display']['fullscreen'], equals(true));
         expect(config['display']['resolution'], equals([600, 1024]));
@@ -385,10 +385,10 @@ void main() {
 
         // Act & Assert
         expect(() async => await ConfigService.initialize(), returnsNormally);
-        
+
         await ConfigService.initialize();
         final config = ConfigService.instance.config;
-        
+
         // Should fall back to defaults
         expect(config['display']['fullscreen'], equals(true));
         expect(config['features']['favorites'], equals(true));
@@ -406,7 +406,7 @@ void main() {
         // - service.isFullscreen
         // - service.displayResolution
         // - service.apiBaseUrl
-        
+
         // Act
         final config = service.config;
 
@@ -418,4 +418,4 @@ void main() {
       });
     });
   });
-} 
+}

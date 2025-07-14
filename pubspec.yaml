@@ -82,23 +82,5 @@ flutter:
   #       - asset: fonts/Roboto-Regular.ttf
   #       - asset: fonts/Roboto-Bold.ttf
   #         weight: 700
-
-# Platform-specific configuration
-platforms:
-  windows:
-    # Windows specific settings
-    plugins:
-      window_manager:
-        path: packages/window_manager
   
-  macos:
-    # MacOS specific settings
-    plugins:
-      window_manager:
-        path: packages/window_manager
-  
-  linux:
-    # Linux specific settings
-    plugins:
-      window_manager:
-        path: packages/window_manager 
+# Platform-specific configuration is handled by the window_manager plugin automatically 

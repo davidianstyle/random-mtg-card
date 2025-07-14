@@ -15,7 +15,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   String _searchQuery = '';
   String _sortBy = 'name'; // name, added_date, set, rarity
   bool _sortAscending = true;
-  
+
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -30,16 +30,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     if (_searchQuery.isNotEmpty) {
       filteredCards = cards.where((card) {
         return card.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-               card.setName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-               card.typeLine.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-               card.rarity.toLowerCase().contains(_searchQuery.toLowerCase());
+            card.setName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            card.typeLine.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            card.rarity.toLowerCase().contains(_searchQuery.toLowerCase());
       }).toList();
     }
 
     // Sort cards
     filteredCards.sort((a, b) {
       int comparison = 0;
-      
+
       switch (_sortBy) {
         case 'name':
           comparison = a.name.compareTo(b.name);
@@ -49,7 +49,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           break;
         case 'rarity':
           // Custom rarity order
-          final rarityOrder = ['common', 'uncommon', 'rare', 'mythic', 'special', 'bonus'];
+          final rarityOrder = [
+            'common',
+            'uncommon',
+            'rare',
+            'mythic',
+            'special',
+            'bonus'
+          ];
           final aIndex = rarityOrder.indexOf(a.rarity.toLowerCase());
           final bIndex = rarityOrder.indexOf(b.rarity.toLowerCase());
           comparison = aIndex.compareTo(bIndex);
@@ -60,7 +67,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           comparison = a.name.compareTo(b.name);
           break;
       }
-      
+
       return _sortAscending ? comparison : -comparison;
     });
 
@@ -94,7 +101,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
           TextButton(
             onPressed: () {
-              Provider.of<AppProvider>(context, listen: false).clearAllFavorites();
+              Provider.of<AppProvider>(context, listen: false)
+                  .clearAllFavorites();
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -139,9 +147,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 value: 'name',
                 child: Row(
                   children: [
-                    Icon(Icons.sort_by_alpha, color: _sortBy == 'name' ? Colors.blue : Colors.white70),
+                    Icon(Icons.sort_by_alpha,
+                        color:
+                            _sortBy == 'name' ? Colors.blue : Colors.white70),
                     const SizedBox(width: 8),
-                    Text('Sort by Name', style: TextStyle(color: _sortBy == 'name' ? Colors.blue : Colors.white)),
+                    Text('Sort by Name',
+                        style: TextStyle(
+                            color: _sortBy == 'name'
+                                ? Colors.blue
+                                : Colors.white)),
                   ],
                 ),
               ),
@@ -149,9 +163,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 value: 'set',
                 child: Row(
                   children: [
-                    Icon(Icons.library_books, color: _sortBy == 'set' ? Colors.blue : Colors.white70),
+                    Icon(Icons.library_books,
+                        color: _sortBy == 'set' ? Colors.blue : Colors.white70),
                     const SizedBox(width: 8),
-                    Text('Sort by Set', style: TextStyle(color: _sortBy == 'set' ? Colors.blue : Colors.white)),
+                    Text('Sort by Set',
+                        style: TextStyle(
+                            color:
+                                _sortBy == 'set' ? Colors.blue : Colors.white)),
                   ],
                 ),
               ),
@@ -159,9 +177,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 value: 'rarity',
                 child: Row(
                   children: [
-                    Icon(Icons.star, color: _sortBy == 'rarity' ? Colors.blue : Colors.white70),
+                    Icon(Icons.star,
+                        color:
+                            _sortBy == 'rarity' ? Colors.blue : Colors.white70),
                     const SizedBox(width: 8),
-                    Text('Sort by Rarity', style: TextStyle(color: _sortBy == 'rarity' ? Colors.blue : Colors.white)),
+                    Text('Sort by Rarity',
+                        style: TextStyle(
+                            color: _sortBy == 'rarity'
+                                ? Colors.blue
+                                : Colors.white)),
                   ],
                 ),
               ),
@@ -198,7 +222,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     prefixIcon: const Icon(Icons.search, color: Colors.white70),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, color: Colors.white70),
+                            icon:
+                                const Icon(Icons.clear, color: Colors.white70),
                             onPressed: () {
                               _searchController.clear();
                               setState(() {
@@ -222,10 +247,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                 ),
               ),
-              
+
               // Stats bar
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -240,7 +266,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ],
                 ),
               ),
-              
+
               // Cards grid
               Expanded(
                 child: favoriteCards.isEmpty
@@ -296,7 +322,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           )
                         : GridView.builder(
                             padding: const EdgeInsets.all(16),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
                               childAspectRatio: 0.7,
                               crossAxisSpacing: 16,
@@ -312,7 +339,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   appProvider.toggleFavorite(card);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('${card.name} removed from favorites'),
+                                      content: Text(
+                                          '${card.name} removed from favorites'),
                                       backgroundColor: Colors.orange,
                                     ),
                                   );
@@ -356,11 +384,13 @@ class FavoriteCardTile extends StatelessWidget {
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(8)),
                   color: Colors.grey[800],
                 ),
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(8)),
                   child: CachedNetworkImage(
                     imageUrl: card.imageUris?.normal ?? '',
                     fit: BoxFit.cover,
@@ -374,7 +404,7 @@ class FavoriteCardTile extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Card info
             Padding(
               padding: const EdgeInsets.all(8),
@@ -417,7 +447,8 @@ class FavoriteCardTile extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.favorite, color: Colors.red, size: 16),
+                        icon: const Icon(Icons.favorite,
+                            color: Colors.red, size: 16),
                         onPressed: onRemove,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -478,7 +509,7 @@ class CardDetailsDialog extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Card image
             Expanded(
               child: Container(
@@ -496,7 +527,7 @@ class CardDetailsDialog extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Card details
             Container(
               padding: const EdgeInsets.all(16),
@@ -527,4 +558,4 @@ class CardDetailsDialog extends StatelessWidget {
       ),
     );
   }
-} 
+}

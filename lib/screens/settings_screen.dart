@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/app_provider.dart';
 import '../services/scryfall_service.dart';
 import '../services/config_service.dart';
 import '../widgets/searchable_multiselect.dart';
@@ -57,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _filtersEnabled = _config.filtersEnabled;
       _autoRefreshEnabled = _config.autoRefreshInterval > 0;
       _autoRefreshInterval = _config.autoRefreshInterval;
-      
+
       _selectedSets = List.from(_config.filterSets);
       _selectedColors = List.from(_config.filterColors);
       _selectedCardTypes = List.from(_config.filterCardTypes);
@@ -94,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _availableCreatureTypes = results[3];
       _availableRarities = results[4];
       _availableFormats = results[5];
-      
+
       _isLoadingSets = false;
       _isLoadingCardTypes = false;
       _isLoadingCreatureTypes = false;
@@ -110,13 +108,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _config.updateConfig('filters.sets', _selectedSets);
     await _config.updateConfig('filters.colors', _selectedColors);
     await _config.updateConfig('filters.card_types', _selectedCardTypes);
-    await _config.updateConfig('filters.creature_types', _selectedCreatureTypes);
+    await _config.updateConfig(
+        'filters.creature_types', _selectedCreatureTypes);
     await _config.updateConfig('filters.rarity', _selectedRarities);
-    await _config.updateConfig('filters.format', _selectedFormats.isNotEmpty ? _selectedFormats.first : 'standard');
-    
+    await _config.updateConfig('filters.format',
+        _selectedFormats.isNotEmpty ? _selectedFormats.first : 'standard');
+
     // Save general settings
-    await _config.updateConfig('display.auto_refresh_interval', _autoRefreshEnabled ? _autoRefreshInterval : 0);
-    
+    await _config.updateConfig('display.auto_refresh_interval',
+        _autoRefreshEnabled ? _autoRefreshInterval : 0);
+
     // Show success message
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -131,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _resetSettings() async {
     await _config.resetToDefaults();
     _loadCurrentSettings();
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -145,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _refreshFilterOptions() {
     _scryfallService.clearFilterCache();
     _loadFilterOptions();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Filter options refreshed!'),
@@ -205,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Enable Filters
                     SwitchListTile(
                       value: _filtersEnabled,
@@ -224,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       activeColor: Colors.blue,
                     ),
-                    
+
                     // Auto Refresh
                     SwitchListTile(
                       value: _autoRefreshEnabled,
@@ -243,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       activeColor: Colors.blue,
                     ),
-                    
+
                     // Auto Refresh Interval
                     if (_autoRefreshEnabled)
                       Padding(
@@ -280,9 +281,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Filter Settings Header
             const Text(
               'Filter Settings',
@@ -297,9 +298,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Configure which cards to include when fetching random cards',
               style: TextStyle(color: Colors.white70),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Sets Filter
             SearchableMultiSelect(
               title: 'Sets',
@@ -315,9 +316,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               placeholder: 'Search sets by name or code...',
               maxHeight: 250,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Colors Filter
             SearchableMultiSelect(
               title: 'Colors',
@@ -333,9 +334,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               placeholder: 'Search colors...',
               maxHeight: 200,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Card Types Filter
             SearchableMultiSelect(
               title: 'Card Types',
@@ -351,9 +352,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               placeholder: 'Search card types...',
               maxHeight: 200,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Creature Types Filter
             SearchableMultiSelect(
               title: 'Creature Types',
@@ -369,9 +370,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               placeholder: 'Search creature types...',
               maxHeight: 300,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Rarity Filter
             SearchableMultiSelect(
               title: 'Rarity',
@@ -387,9 +388,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               placeholder: 'Search rarities...',
               maxHeight: 200,
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Format Filter (single select)
             SearchableMultiSelect(
               title: 'Format',
@@ -406,9 +407,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               placeholder: 'Search formats...',
               maxHeight: 250,
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Action Buttons
             Row(
               children: [
@@ -437,11 +438,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
-} 
+}

@@ -7,33 +7,37 @@ import '../services/config_service.dart';
 class CardProvider extends ChangeNotifier {
   final ScryfallService _scryfallService = ScryfallService.instance;
   final ConfigService _config = ConfigService.instance;
-  
+
   MTGCard? _currentCard;
   List<MTGCard> _cardHistory = [];
   int _currentIndex = -1;
   bool _isLoading = false;
   String? _errorMessage;
-  
+
   // Getters
   MTGCard? get currentCard => _currentCard;
   List<MTGCard> get cardHistory => _cardHistory;
   int get currentIndex => _currentIndex;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  
+
   bool get canGoBack => _currentIndex > 0;
   bool get canGoForward => _currentIndex < _cardHistory.length - 1;
-  
+
+  // Aliases for tests
+  bool get canGoToPrevious => canGoBack;
+  bool get canGoToNext => canGoForward;
+
   // Initialize and load first card
   Future<void> initialize() async {
     await loadRandomCard();
   }
-  
+
   // Load a new random card
   Future<void> loadRandomCard() async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final card = await _scryfallService.getRandomCardWithFilters();
       if (card != null) {
@@ -47,7 +51,7 @@ class CardProvider extends ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Navigate to previous card
   Future<void> goToPreviousCard() async {
     if (canGoBack) {
@@ -59,7 +63,7 @@ class CardProvider extends ChangeNotifier {
       await loadRandomCard();
     }
   }
-  
+
   // Navigate to next card
   Future<void> goToNextCard() async {
     if (canGoForward) {
@@ -71,12 +75,12 @@ class CardProvider extends ChangeNotifier {
       await loadRandomCard();
     }
   }
-  
+
   // Load a specific card by ID
   Future<void> loadCard(String cardId) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final card = await _scryfallService.getCard(cardId);
       if (card != null) {
@@ -90,7 +94,7 @@ class CardProvider extends ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Refresh current card (reload from API)
   Future<void> refreshCurrentCard() async {
     if (_currentCard != null) {
@@ -99,7 +103,7 @@ class CardProvider extends ChangeNotifier {
       await loadRandomCard();
     }
   }
-  
+
   // Handle swipe gestures
   Future<void> handleSwipe(bool isLeftSwipe) async {
     if (isLeftSwipe) {
@@ -108,7 +112,7 @@ class CardProvider extends ChangeNotifier {
       await goToPreviousCard();
     }
   }
-  
+
   // Auto-refresh functionality
   void startAutoRefresh() {
     if (_config.autoRefreshInterval > 0) {
@@ -119,18 +123,18 @@ class CardProvider extends ChangeNotifier {
       });
     }
   }
-  
+
   void stopAutoRefresh() {
     // Auto-refresh is stopped by setting interval to 0 in config
   }
-  
+
   // Clear history
   void clearHistory() {
     _cardHistory.clear();
     _currentIndex = -1;
     notifyListeners();
   }
-  
+
   // Get card at specific index
   MTGCard? getCardAtIndex(int index) {
     if (index >= 0 && index < _cardHistory.length) {
@@ -138,7 +142,7 @@ class CardProvider extends ChangeNotifier {
     }
     return null;
   }
-  
+
   // Jump to specific card in history
   void jumpToCard(int index) {
     if (index >= 0 && index < _cardHistory.length) {
@@ -147,50 +151,50 @@ class CardProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   // Private methods
   void _setCurrentCard(MTGCard card) {
     _currentCard = card;
-    
+
     // Add to history
     if (_currentIndex < _cardHistory.length - 1) {
       // Remove cards after current position (user navigated back and got new card)
       _cardHistory.removeRange(_currentIndex + 1, _cardHistory.length);
     }
-    
+
     _cardHistory.add(card);
     _currentIndex = _cardHistory.length - 1;
-    
+
     // Limit history size to prevent memory issues
     const maxHistorySize = 50;
     if (_cardHistory.length > maxHistorySize) {
       _cardHistory.removeAt(0);
       _currentIndex--;
     }
-    
+
     notifyListeners();
   }
-  
+
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
   }
-  
+
   void _setError(String error) {
     _errorMessage = error;
     notifyListeners();
   }
-  
+
   void _clearError() {
     _errorMessage = null;
     notifyListeners();
   }
-  
+
   // Get history info for debugging
   String getHistoryInfo() {
     return 'History: ${_cardHistory.length} cards, current index: $_currentIndex';
   }
-  
+
   // Preload next card for better performance
   Future<void> preloadNextCard() async {
     try {
@@ -204,4 +208,23 @@ class CardProvider extends ChangeNotifier {
       print('Error preloading next card: $e');
     }
   }
-} 
+
+  // Public methods for testing
+  void setCurrentCard(MTGCard? card) {
+    if (card != null) {
+      _setCurrentCard(card);
+    }
+  }
+
+  void setLoading(bool loading) {
+    _setLoading(loading);
+  }
+
+  void setError(String error) {
+    _setError(error);
+  }
+
+  void clearError() {
+    _clearError();
+  }
+}

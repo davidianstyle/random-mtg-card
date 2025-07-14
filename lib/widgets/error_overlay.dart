@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ErrorOverlay extends StatelessWidget {
   final String message;
   final VoidCallback? onDismiss;
-  
+
   const ErrorOverlay({
     super.key,
     required this.message,
@@ -58,7 +58,8 @@ class ErrorOverlay extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[700],
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 child: const Text('Dismiss'),
               ),
@@ -68,4 +69,4 @@ class ErrorOverlay extends StatelessWidget {
       ),
     );
   }
-} 
+}

@@ -7,7 +7,7 @@ import '../services/scryfall_service.dart';
 
 class MenuOverlay extends StatefulWidget {
   final VoidCallback onClose;
-  
+
   const MenuOverlay({
     super.key,
     required this.onClose,
@@ -30,7 +30,7 @@ class _MenuOverlayState extends State<MenuOverlay>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    
+
     _scaleAnimation = Tween<double>(
       begin: 0.8,
       end: 1.0,
@@ -38,7 +38,7 @@ class _MenuOverlayState extends State<MenuOverlay>
       parent: _animationController,
       curve: Curves.easeOutBack,
     ));
-    
+
     _opacityAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -46,7 +46,7 @@ class _MenuOverlayState extends State<MenuOverlay>
       parent: _animationController,
       curve: Curves.easeOut,
     ));
-    
+
     _animationController.forward();
   }
 
@@ -87,7 +87,7 @@ class _MenuOverlayState extends State<MenuOverlay>
               color: Colors.black.withOpacity(0.7),
             ),
           ),
-          
+
           // Menu content
           Center(
             child: AnimatedBuilder(
@@ -154,7 +154,7 @@ class _MenuOverlayState extends State<MenuOverlay>
                               ],
                             ),
                           ),
-                          
+
                           // Menu items
                           Padding(
                             padding: const EdgeInsets.all(16),
@@ -180,7 +180,9 @@ class _MenuOverlayState extends State<MenuOverlay>
                                   subtitle: 'Get a fresh random card',
                                   onTap: () {
                                     widget.onClose();
-                                    Provider.of<CardProvider>(context, listen: false).loadRandomCard();
+                                    Provider.of<CardProvider>(context,
+                                            listen: false)
+                                        .loadRandomCard();
                                   },
                                 ),
                                 const SizedBox(height: 8),
@@ -202,7 +204,7 @@ class _MenuOverlayState extends State<MenuOverlay>
                               ],
                             ),
                           ),
-                          
+
                           // Footer
                           Container(
                             padding: const EdgeInsets.all(16),
@@ -289,4 +291,4 @@ class _MenuOverlayState extends State<MenuOverlay>
       ),
     );
   }
-} 
+}

@@ -4,8 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../models/mtg_card.dart';
 
 class CardWidget extends StatelessWidget {
-  final MTGCard card;
-  
+  final MTGCard? card;
+
   const CardWidget({
     super.key,
     required this.card,
@@ -13,6 +13,10 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (card == null) {
+      return _buildNoCardPlaceholder();
+    }
+
     return Center(
       child: Container(
         width: 540,
@@ -36,8 +40,8 @@ class CardWidget extends StatelessWidget {
   }
 
   Widget _buildCardImage() {
-    final imageUrl = card.bestImageUrl;
-    
+    final imageUrl = card!.bestImageUrl;
+
     if (imageUrl == null) {
       return _buildPlaceholder();
     }
@@ -89,6 +93,48 @@ class CardWidget extends StatelessWidget {
     );
   }
 
+  Widget _buildNoCardPlaceholder() {
+    return Container(
+      width: 540,
+      height: 756,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.grey.shade800.withValues(alpha: 0.9),
+            Colors.grey.shade900.withValues(alpha: 0.9),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.grey.shade600,
+          width: 1,
+        ),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.help_outline,
+              size: 48,
+              color: Colors.white54,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No card to display',
+              style: TextStyle(
+                color: Colors.white54,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildErrorPlaceholder() {
     return Container(
       width: 540,
@@ -125,7 +171,7 @@ class CardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              card.name,
+              card!.name,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 16,
@@ -134,7 +180,7 @@ class CardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              card.setInfo,
+              card!.setInfo,
               style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 14,
@@ -183,7 +229,7 @@ class CardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              card.name,
+              card!.name,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 16,
@@ -192,7 +238,7 @@ class CardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              card.typeLine,
+              card!.typeLine,
               style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 14,
@@ -201,7 +247,7 @@ class CardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              card.setInfo,
+              card!.setInfo,
               style: const TextStyle(
                 color: Colors.white54,
                 fontSize: 14,
@@ -213,4 +259,4 @@ class CardWidget extends StatelessWidget {
       ),
     );
   }
-} 
+}
