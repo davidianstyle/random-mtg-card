@@ -24,4 +24,82 @@ jobs:
           config-file: .github/release-please-config.json
           manifest-file: .github/.release-please-manifest.json
 
+  # Build and attach artifacts to release
+  build-artifacts:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.releases_created }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            build-script: ./scripts/build_linux.sh
+            artifact-name: mtg-card-display-linux
+            artifact-path: build/linux/x64/release/bundle/
+          - os: macos-latest
+            build-script: ./scripts/build_macos.sh
+            artifact-name: mtg-card-display-macos
+            artifact-path: build/macos/Build/Products/Release/random_mtg_card.app
+          - os: windows-latest
+            build-script: ./scripts/build_windows.bat
+            artifact-name: mtg-card-display-windows
+            artifact-path: build/windows/runner/Release/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libblkid-dev liblzma-dev
+
+      - name: Make build script executable (Unix)
+        if: runner.os != 'Windows'
+        run: chmod +x ${{ matrix.build-script }}
+
+      - name: Build application
+        run: ${{ matrix.build-script }} release
+
+      - name: Create archive (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd build/linux/x64/release/bundle/
+          tar -czf ../../../../../mtg-card-display-linux.tar.gz .
+
+      - name: Create archive (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          cd build/macos/Build/Products/Release/
+          zip -r ../../../../../mtg-card-display-macos.zip random_mtg_card.app
+
+      - name: Create archive (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd build/windows/runner/Release/
+          7z a ../../../../mtg-card-display-windows.zip .
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: |
+            mtg-card-display-*.zip
+            mtg-card-display-*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
  

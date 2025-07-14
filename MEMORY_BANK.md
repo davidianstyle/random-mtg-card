@@ -32,10 +32,11 @@
    - Outputs `releases_created` and `tag_name` for downstream jobs
 
 2. **Build Artifacts Job**: 
-   - Runs only when new release is created
-   - Cross-platform builds (Linux, macOS, Windows)
-   - Attaches binary artifacts to GitHub release
+   - Runs only when new release is created (`if: ${{ needs.release-please.outputs.releases_created }}`)
+   - Cross-platform builds (Linux, macOS, Windows) 
+   - Attaches binary artifacts to GitHub release using correct tag name
    - Uses matrix strategy for parallel builds
+   - Depends on `release-please` job completion
 
 ### Cross-Platform Build Integration
 **Build Scripts**:
@@ -98,7 +99,7 @@
 2. **PR Creation**: Submit PR with conventional commit messages
 3. **Review & Merge**: Maintainers merge to main branch
 4. **Automated Release**: Release Please creates release PR automatically
-5. **Release Publishing**: Merging release PR triggers build and publish
+5. **Release Publishing**: Merging release PR triggers release creation and cross-platform artifact building
 
 ### Commit Message Examples
 ```bash
@@ -161,6 +162,12 @@ feat!: redesign settings configuration format
 - Cross-platform build verification
 - Prevents broken releases
 
+### Release Automation
+**File**: `.github/workflows/release-please.yml`
+- Creates release PRs with automated changelogs
+- Builds and attaches cross-platform artifacts when releases are published
+- Integrates release creation and artifact bundling in single workflow
+
 ### Quality Gates
 - All tests must pass
 - Code analysis must pass
@@ -194,7 +201,7 @@ feat!: redesign settings configuration format
 - **Build failures**: Check platform-specific dependencies
 - **Invalid previous_tag parameter**: Manifest version doesn't match existing git tags - reset manifest to `0.0.0` for new repos
 - **⚠️ Formatting check failures**: Always run `dart format .` before committing - CI has strict formatting requirements
-- **Build artifacts not triggering**: Release Please creates tags with GITHUB_TOKEN which doesn't trigger other workflows - use `release` event instead of `push` with tags
+- **Build artifacts not triggering**: Release Please creates tags with GITHUB_TOKEN which doesn't trigger other workflows - include `build-artifacts` job directly in `release-please.yml` with `needs: release-please` dependency
 - **"GitHub Actions is not permitted to create or approve pull requests"**: Repository settings need to allow Actions to create PRs
   - Go to Settings → Actions → General → Workflow permissions
   - Enable "Allow GitHub Actions to create and approve pull requests"
@@ -239,8 +246,9 @@ dart format --output=none --set-exit-if-changed .
 ### Automated Release Management
 - **Zero-effort releases**: No manual version bumping or changelog maintenance
 - **Consistent versioning**: Semantic versioning based on commit types
-- **Cross-platform builds**: Automatic artifact generation for all platforms
-- **Professional releases**: Consistent changelog format and GitHub releases
+- **Cross-platform builds**: Automatic artifact generation for all platforms within single workflow
+- **Professional releases**: Consistent changelog format and GitHub releases with attached binaries
+- **Simplified architecture**: Release creation and artifact building integrated in single workflow
 
 ### Developer Experience
 - **Clear contribution guidelines**: Conventional commits provide structure
@@ -253,5 +261,16 @@ dart format --output=none --set-exit-if-changed .
 - **Artifact management**: Binaries automatically attached to releases
 - **Version tracking**: Manifest maintains current state
 - **Quality assurance**: Multiple quality gates before release
+
+## Current Architecture Summary
+
+### Workflow Integration (Final Approach)
+- **CI Workflow** (`ci.yml`): Handles testing, code quality, and build verification for PRs/pushes
+- **Release Workflow** (`release-please.yml`): Handles both release creation AND artifact building in single workflow
+- **Key Benefits**:
+  - Simplified architecture with release + build in one place
+  - Proper job dependencies (`build-artifacts` needs `release-please`)
+  - Automatic artifact attachment to GitHub releases
+  - No complex cross-workflow triggering issues
 
 This Release Please setup provides a complete, professional release management system that scales with the project while maintaining high quality standards and developer productivity. 
