@@ -3,10 +3,6 @@ targets:
     builders:
       json_serializable:
         options:
-          # Creates a single .g.dart file for all models
-          build_extensions: {".dart": [".g.dart"]}
-          # Generate toJson() and fromJson() methods
-          generate_to_json_function: true
           # Use explicit nullable types
           explicit_to_json: true
           # Include JSON keys in field names

@@ -12,6 +12,9 @@ import 'services/config_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Initialize configuration first
+  await ConfigService.initialize();
+  
   // Initialize window manager for desktop platforms
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
@@ -19,9 +22,6 @@ void main() async {
     // Configure window based on platform
     await _configureWindow();
   }
-  
-  // Initialize configuration
-  await ConfigService.initialize();
   
   runApp(const MTGCardDisplayApp());
 }

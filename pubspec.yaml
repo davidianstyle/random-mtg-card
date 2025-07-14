@@ -32,9 +32,6 @@ dependencies:
   
   # Window management for desktop platforms
   window_manager: ^0.3.7
-  
-  # Gesture handling utilities
-  flutter_gesture_detector: ^2.0.0
 
 dev_dependencies:
   flutter_test:
