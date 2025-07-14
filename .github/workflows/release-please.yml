@@ -27,7 +27,7 @@ jobs:
   # Build and attach artifacts to release
   build-artifacts:
     needs: release-please
-    if: ${{ needs.release-please.outputs.releases_created }}
+    if: ${{ needs.release-please.outputs.releases_created == 'true' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -74,6 +74,12 @@ jobs:
       - name: Build application
         run: ${{ matrix.build-script }} release
 
+      - name: Debug - List build directory (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "Listing build directory structure:"
+          if (Test-Path "build") { Get-ChildItem -Recurse build } else { echo "build directory does not exist" }
+
       - name: Create archive (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -89,8 +95,21 @@ jobs:
       - name: Create archive (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          cd build/windows/runner/Release/
-          7z a ../../../../mtg-card-display-windows.zip .
+          # Check for different possible Flutter build output locations
+          if (Test-Path "build/windows/x64/runner/Release") {
+            echo "Found build output at: build/windows/x64/runner/Release"
+            cd build/windows/x64/runner/Release/
+            7z a ../../../../../mtg-card-display-windows.zip .
+          } elseif (Test-Path "build/windows/runner/Release") {
+            echo "Found build output at: build/windows/runner/Release"
+            cd build/windows/runner/Release/
+            7z a ../../../../mtg-card-display-windows.zip .
+          } else {
+            echo "Error: Could not find Windows build output directory"
+            echo "Available directories:"
+            Get-ChildItem -Recurse build/windows/ -Directory
+            exit 1
+          }
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
