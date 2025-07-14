@@ -16,7 +16,8 @@ void main() {
       SharedPreferences.setMockInitialValues({});
     });
 
-    testWidgets('should launch app and display initial screen', (WidgetTester tester) async {
+    testWidgets('should launch app and display initial screen',
+        (WidgetTester tester) async {
       // Arrange & Act
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 2));
@@ -26,7 +27,8 @@ void main() {
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
-    testWidgets('should display card widget on main screen', (WidgetTester tester) async {
+    testWidgets('should display card widget on main screen',
+        (WidgetTester tester) async {
       // Arrange & Act
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -35,7 +37,8 @@ void main() {
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should display favorite indicator', (WidgetTester tester) async {
+    testWidgets('should display favorite indicator',
+        (WidgetTester tester) async {
       // Arrange & Act
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -44,7 +47,8 @@ void main() {
       expect(find.byType(FavoriteIndicator), findsOneWidget);
     });
 
-    testWidgets('should handle single tap to toggle metadata', (WidgetTester tester) async {
+    testWidgets('should handle single tap to toggle metadata',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -65,7 +69,8 @@ void main() {
       expect(find.byType(CardMetadataOverlay), findsNothing);
     });
 
-    testWidgets('should handle double tap to toggle favorite', (WidgetTester tester) async {
+    testWidgets('should handle double tap to toggle favorite',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -83,7 +88,8 @@ void main() {
       expect(favoriteIndicator, findsOneWidget);
     });
 
-    testWidgets('should handle swipe left gesture for navigation', (WidgetTester tester) async {
+    testWidgets('should handle swipe left gesture for navigation',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -98,7 +104,8 @@ void main() {
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should handle swipe right gesture for navigation', (WidgetTester tester) async {
+    testWidgets('should handle swipe right gesture for navigation',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -113,7 +120,8 @@ void main() {
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should handle long press gesture', (WidgetTester tester) async {
+    testWidgets('should handle long press gesture',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -128,14 +136,15 @@ void main() {
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should maintain app state across gesture interactions', (WidgetTester tester) async {
+    testWidgets('should maintain app state across gesture interactions',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Act - Perform multiple gestures
       final cardWidget = find.byType(CardWidget);
-      
+
       // Single tap to show metadata
       await tester.tap(cardWidget);
       await tester.pumpAndSettle();
@@ -157,20 +166,21 @@ void main() {
       expect(find.byType(FavoriteIndicator), findsOneWidget);
     });
 
-    testWidgets('should handle error states gracefully', (WidgetTester tester) async {
+    testWidgets('should handle error states gracefully',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Act - Try to trigger error conditions
       final cardWidget = find.byType(CardWidget);
-      
+
       // Rapid gestures that might cause errors
       for (int i = 0; i < 5; i++) {
         await tester.tap(cardWidget);
         await tester.pump(const Duration(milliseconds: 10));
       }
-      
+
       await tester.pumpAndSettle();
 
       // Assert
@@ -178,7 +188,8 @@ void main() {
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should persist favorites across app restarts', (WidgetTester tester) async {
+    testWidgets('should persist favorites across app restarts',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -200,7 +211,8 @@ void main() {
       expect(find.byType(FavoriteIndicator), findsOneWidget);
     });
 
-    testWidgets('should handle orientation changes', (WidgetTester tester) async {
+    testWidgets('should handle orientation changes',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -219,7 +231,8 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('should handle network connectivity issues', (WidgetTester tester) async {
+    testWidgets('should handle network connectivity issues',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
@@ -227,24 +240,25 @@ void main() {
       // Act
       // The app should handle network issues gracefully
       // This would require more complex setup to simulate network failures
-      
+
       // Assert
       // App should still be functional
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should handle rapid user interactions', (WidgetTester tester) async {
+    testWidgets('should handle rapid user interactions',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Act - Perform rapid interactions
       final cardWidget = find.byType(CardWidget);
-      
+
       for (int i = 0; i < 10; i++) {
         await tester.tap(cardWidget);
         await tester.pump(const Duration(milliseconds: 100));
-        
+
         if (i % 2 == 0) {
           await tester.fling(cardWidget, const Offset(-100, 0), 500);
         } else {
@@ -252,7 +266,7 @@ void main() {
         }
         await tester.pump(const Duration(milliseconds: 100));
       }
-      
+
       await tester.pumpAndSettle();
 
       // Assert
@@ -268,7 +282,7 @@ void main() {
 
       // Act - Simulate memory pressure by navigating through many cards
       final cardWidget = find.byType(CardWidget);
-      
+
       for (int i = 0; i < 20; i++) {
         await tester.fling(cardWidget, const Offset(-200, 0), 800);
         await tester.pumpAndSettle(const Duration(milliseconds: 200));
@@ -279,14 +293,15 @@ void main() {
       expect(find.byType(CardWidget), findsOneWidget);
     });
 
-    testWidgets('should maintain consistent UI state', (WidgetTester tester) async {
+    testWidgets('should maintain consistent UI state',
+        (WidgetTester tester) async {
       // Arrange
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       // Act - Perform various operations
       final cardWidget = find.byType(CardWidget);
-      
+
       // Show metadata
       await tester.tap(cardWidget);
       await tester.pumpAndSettle();
@@ -313,4 +328,4 @@ void main() {
       expect(find.byType(FavoriteIndicator), findsOneWidget);
     });
   });
-} 
+}

@@ -197,6 +197,20 @@ feat!: redesign settings configuration format
   - Enable "Allow GitHub Actions to create and approve pull requests"
 - **"You do not have permission to create labels on this repository"**: Workflow needs `issues: write` permission
   - Add `issues: write` to the permissions section in the workflow file
+- **"release-please failed: Invalid previous_tag parameter"**: Manifest version doesn't match existing git tags
+  - Reset manifest to `0.0.0` for new repos, sync pubspec.yaml version
+- **Code analysis failures in CI**: Missing provider methods, type mismatches, null safety issues
+  - Add missing public methods to providers for testing
+  - Fix nullable types and null-safety issues
+  - Remove unused imports and clean up code quality issues
+- **Flutter analysis issues (41 → 0)**: Comprehensive code quality improvements
+  - Replace `print()` with `debugPrint()` for production-safe logging (30 issues)
+  - Replace deprecated `withOpacity()` with `withValues(alpha:)` (8 issues)
+  - Make private fields `final` where appropriate (2 issues)
+  - Replace `Container` with `SizedBox` for whitespace (2 issues)
+  - Use `const` for compile-time constants (1 issue)
+  - Remove unused variables (1 issue)
+  - Add proper imports for `debugPrint` from `flutter/foundation.dart`
 
 ### Debug Commands
 ```bash

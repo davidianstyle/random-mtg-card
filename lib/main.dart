@@ -11,28 +11,28 @@ import 'services/config_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize configuration first
   await ConfigService.initialize();
-  
+
   // Initialize window manager for desktop platforms
   if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
     await windowManager.ensureInitialized();
-    
+
     // Configure window based on platform
     await _configureWindow();
   }
-  
+
   runApp(const MTGCardDisplayApp());
 }
 
 Future<void> _configureWindow() async {
   final config = ConfigService.instance.config;
   final displayConfig = config['display'] as Map<String, dynamic>;
-  
+
   // Default window size (can be overridden by config)
   Size windowSize = const Size(600, 1024);
-  
+
   // Platform-specific window configuration
   if (Platform.isLinux) {
     // Linux (Raspberry Pi) - Full-screen kiosk mode
@@ -44,7 +44,7 @@ Future<void> _configureWindow() async {
       titleBarStyle: TitleBarStyle.hidden,
       fullScreen: displayConfig['fullscreen'] == true,
     );
-    
+
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       if (displayConfig['fullscreen'] == true) {
         await windowManager.setFullScreen(true);
@@ -65,11 +65,11 @@ Future<void> _configureWindow() async {
       maximumSize: const Size(800, 1200),
       title: 'MTG Card Display',
     );
-    
+
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
-      
+
       // Optional fullscreen on desktop (can be toggled with F11)
       if (displayConfig['fullscreen'] == true) {
         await windowManager.setFullScreen(true);
@@ -114,10 +114,10 @@ class MTGCardDisplayApp extends StatelessWidget {
             ]);
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
           }
-          
+
           return child ?? Container();
         },
       ),
     );
   }
-} 
+}

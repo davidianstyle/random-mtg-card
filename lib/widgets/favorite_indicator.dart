@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class FavoriteIndicator extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback? onTap;
-  
+
   const FavoriteIndicator({
     super.key,
     required this.isFavorite,
@@ -18,7 +18,7 @@ class FavoriteIndicator extends StatelessWidget {
         width: 30,
         height: 30,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6),
+          color: Colors.black.withValues(alpha: 0.6),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Icon(
@@ -29,4 +29,4 @@ class FavoriteIndicator extends StatelessWidget {
       ),
     );
   }
-} 
+}

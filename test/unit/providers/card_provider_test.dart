@@ -268,7 +268,7 @@ void main() {
     group('History Management', () {
       test('should limit history size', () {
         // Arrange
-        final maxHistorySize = 50; // Assuming this is the limit
+        const maxHistorySize = 50; // Assuming this is the limit
 
         // Act
         for (int i = 0; i < maxHistorySize + 10; i++) {
@@ -322,14 +322,16 @@ void main() {
 
       test('should maintain history order', () {
         // Arrange
-        final cards = List.generate(5, (i) => MTGCard(
-          id: 'test-card-$i',
-          name: 'Test Card $i',
-          typeLine: 'Instant',
-          set: 'test',
-          setName: 'Test Set',
-          rarity: 'common',
-        ));
+        final cards = List.generate(
+            5,
+            (i) => MTGCard(
+                  id: 'test-card-$i',
+                  name: 'Test Card $i',
+                  typeLine: 'Instant',
+                  set: 'test',
+                  setName: 'Test Set',
+                  rarity: 'common',
+                ));
 
         // Act
         for (final card in cards) {
@@ -532,14 +534,16 @@ void main() {
 
       test('should handle rapid navigation changes', () {
         // Arrange
-        final cards = List.generate(5, (i) => MTGCard(
-          id: 'test-card-$i',
-          name: 'Test Card $i',
-          typeLine: 'Instant',
-          set: 'test',
-          setName: 'Test Set',
-          rarity: 'common',
-        ));
+        final cards = List.generate(
+            5,
+            (i) => MTGCard(
+                  id: 'test-card-$i',
+                  name: 'Test Card $i',
+                  typeLine: 'Instant',
+                  set: 'test',
+                  setName: 'Test Set',
+                  rarity: 'common',
+                ));
 
         for (final card in cards) {
           provider.setCurrentCard(card);
@@ -572,4 +576,4 @@ void main() {
       });
     });
   });
-} 
+}

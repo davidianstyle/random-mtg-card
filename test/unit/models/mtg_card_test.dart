@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:random_mtg_card/models/mtg_card.dart';
 
@@ -42,7 +41,8 @@ void main() {
         expect(card.name, equals('Lightning Bolt'));
         expect(card.manaCost, equals('{R}'));
         expect(card.typeLine, equals('Instant'));
-        expect(card.oracleText, equals('Lightning Bolt deals 3 damage to any target.'));
+        expect(card.oracleText,
+            equals('Lightning Bolt deals 3 damage to any target.'));
         expect(card.colors, equals(['R']));
         expect(card.colorIdentity, equals(['R']));
         expect(card.set, equals('lea'));
@@ -94,7 +94,8 @@ void main() {
         expect(json['name'], equals('Lightning Bolt'));
         expect(json['mana_cost'], equals('{R}'));
         expect(json['type_line'], equals('Instant'));
-        expect(json['oracle_text'], equals('Lightning Bolt deals 3 damage to any target.'));
+        expect(json['oracle_text'],
+            equals('Lightning Bolt deals 3 damage to any target.'));
         expect(json['colors'], equals(['R']));
         expect(json['color_identity'], equals(['R']));
         expect(json['set'], equals('lea'));
@@ -195,7 +196,8 @@ void main() {
         expect(imageUris.large, equals('https://example.com/large.jpg'));
         expect(imageUris.png, equals('https://example.com/png.png'));
         expect(imageUris.artCrop, equals('https://example.com/art_crop.jpg'));
-        expect(imageUris.borderCrop, equals('https://example.com/border_crop.jpg'));
+        expect(imageUris.borderCrop,
+            equals('https://example.com/border_crop.jpg'));
       });
 
       test('should serialize ImageUris to JSON', () {
@@ -218,7 +220,8 @@ void main() {
         expect(json['large'], equals('https://example.com/large.jpg'));
         expect(json['png'], equals('https://example.com/png.png'));
         expect(json['art_crop'], equals('https://example.com/art_crop.jpg'));
-        expect(json['border_crop'], equals('https://example.com/border_crop.jpg'));
+        expect(
+            json['border_crop'], equals('https://example.com/border_crop.jpg'));
       });
 
       test('should handle null values in ImageUris', () {
@@ -478,11 +481,12 @@ void main() {
 
         // Assert
         expect(json['type'], equals('search'));
-        expect(json['totalCards'], equals(100));
+        expect(json['total_cards'], equals(100));
         expect(json['has_more'], isTrue);
-        expect(json['next_page'], equals('https://api.scryfall.com/cards/search?page=2'));
+        expect(json['next_page'],
+            equals('https://api.scryfall.com/cards/search?page=2'));
         expect(json['data'], equals([]));
       });
     });
   });
-} 
+}

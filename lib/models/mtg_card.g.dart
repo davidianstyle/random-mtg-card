@@ -71,11 +71,9 @@ Map<String, dynamic> _$ImageUrisToJson(ImageUris instance) => <String, dynamic>{
 
 ScryfallResponse _$ScryfallResponseFromJson(Map<String, dynamic> json) =>
     ScryfallResponse(
-      object: json['object'] == null
-          ? null
-          : MTGCard.fromJson(json['object'] as Map<String, dynamic>),
+      object: json['object'] as String?,
       type: json['type'] as String?,
-      totalCards: (json['totalCards'] as num?)?.toInt(),
+      totalCards: (json['total_cards'] as num?)?.toInt(),
       data: (json['data'] as List<dynamic>?)
           ?.map((e) => MTGCard.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -85,9 +83,9 @@ ScryfallResponse _$ScryfallResponseFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$ScryfallResponseToJson(ScryfallResponse instance) =>
     <String, dynamic>{
-      if (instance.object?.toJson() case final value?) 'object': value,
+      if (instance.object case final value?) 'object': value,
       if (instance.type case final value?) 'type': value,
-      if (instance.totalCards case final value?) 'totalCards': value,
+      if (instance.totalCards case final value?) 'total_cards': value,
       if (instance.data?.map((e) => e.toJson()).toList() case final value?)
         'data': value,
       if (instance.hasMore case final value?) 'has_more': value,
