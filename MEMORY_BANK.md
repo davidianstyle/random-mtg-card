@@ -195,7 +195,6 @@ feat!: redesign settings configuration format
 - **Invalid previous_tag parameter**: Manifest version doesn't match existing git tags - reset manifest to `0.0.0` for new repos
 - **⚠️ Formatting check failures**: Always run `dart format .` before committing - CI has strict formatting requirements
 - **Build artifacts not triggering**: Release Please creates tags with GITHUB_TOKEN which doesn't trigger other workflows - use `release` event instead of `push` with tags
-- **Release Please v4 only creating tags**: Release Please v4 may only create tags, not full GitHub releases - add explicit `softprops/action-gh-release@v1` step in release-please.yml
 - **"GitHub Actions is not permitted to create or approve pull requests"**: Repository settings need to allow Actions to create PRs
   - Go to Settings → Actions → General → Workflow permissions
   - Enable "Allow GitHub Actions to create and approve pull requests"
