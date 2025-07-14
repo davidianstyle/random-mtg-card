@@ -1,9 +1,9 @@
 name: random_mtg_card
-description: A cross-platform MTG card display app with gesture navigation for Windows, MacOS, and Linux
+description: Cross-platform MTG card display app with comprehensive filtering, favorites, and gesture navigation
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

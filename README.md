@@ -326,14 +326,95 @@ sudo systemctl start mtg-card-display.service
 ### Development Workflow
 1. Fork the repository
 2. Create a feature branch
-3. Run tests: `flutter test`
-4. Build for your platform: `./scripts/build_universal.sh`
-5. Submit a pull request
+3. Set up commit template (optional): `git config commit.template .gitmessage`
+4. Use conventional commits (see Release Management section)
+5. Run tests: `flutter test`
+6. Build for your platform: `./scripts/build_universal.sh`
+7. Submit a pull request with conventional commit messages
 
 ### Code Style
 - Follow Dart style guide
 - Use `flutter analyze` to check code quality
 - Ensure all tests pass before submitting
+
+## Release Management
+
+This project uses [Release Please](https://github.com/googleapis/release-please) for automated release management. Releases are automatically created based on [Conventional Commits](https://www.conventionalcommits.org/).
+
+### Commit Message Format
+
+Use conventional commit messages to trigger automatic releases:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### Commit Types
+
+- **feat**: A new feature (triggers MINOR version bump)
+- **fix**: A bug fix (triggers PATCH version bump)  
+- **docs**: Documentation only changes
+- **style**: Changes that don't affect code meaning (formatting, etc.)
+- **refactor**: Code change that neither fixes a bug nor adds a feature
+- **perf**: Performance improvement (triggers PATCH version bump)
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes affecting build system or external dependencies
+- **ci**: Changes to CI configuration files and scripts
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+#### Breaking Changes
+
+Add `BREAKING CHANGE:` in the footer or use `!` after the type to trigger a MAJOR version bump:
+
+```bash
+feat!: redesign settings interface
+
+BREAKING CHANGE: Settings screen now requires new configuration format
+```
+
+#### Examples
+
+```bash
+# New feature (1.0.0 → 1.1.0)
+feat: add dark mode theme option
+
+# Bug fix (1.0.0 → 1.0.1)  
+fix: resolve card image loading issue on macOS
+
+# Performance improvement (1.0.0 → 1.0.1)
+perf: optimize card caching mechanism
+
+# Breaking change (1.0.0 → 2.0.0)
+feat!: redesign filter configuration API
+
+BREAKING CHANGE: FilterConfig class now requires different constructor parameters
+```
+
+### Release Process
+
+1. **Development**: Create PRs with conventional commit messages
+2. **Merge to main**: When PRs are merged, Release Please analyzes commits
+3. **Release PR**: If releaseable commits are found, Release Please creates a release PR
+4. **Release**: When the release PR is merged, a new release is published with:
+   - Updated version in `pubspec.yaml`
+   - Generated `CHANGELOG.md` entries
+   - Git tag
+   - Cross-platform build artifacts (Windows, macOS, Linux)
+
+### Manual Release Override
+
+To create a release immediately, add this to your commit message:
+
+```bash
+feat: add new feature
+
+Release-As: 1.2.0
+```
 
 ## License
 
