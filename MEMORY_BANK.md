@@ -176,6 +176,7 @@ feat!: redesign settings configuration format
 3. **Write descriptive commit messages** for clear changelog entries
 4. **Test thoroughly** before submitting PRs
 5. **Update documentation** for API changes
+6. **⚠️ ALWAYS run `dart format .` before committing** - CI fails if files are not properly formatted
 
 ### For Maintainers
 1. **Review commit messages** during PR review
@@ -192,6 +193,7 @@ feat!: redesign settings configuration format
 - **Changelog formatting**: Verify conventional commit format
 - **Build failures**: Check platform-specific dependencies
 - **Invalid previous_tag parameter**: Manifest version doesn't match existing git tags - reset manifest to `0.0.0` for new repos
+- **⚠️ Formatting check failures**: Always run `dart format .` before committing - CI has strict formatting requirements
 - **"GitHub Actions is not permitted to create or approve pull requests"**: Repository settings need to allow Actions to create PRs
   - Go to Settings → Actions → General → Workflow permissions
   - Enable "Allow GitHub Actions to create and approve pull requests"
@@ -223,6 +225,12 @@ chmod +x ./scripts/build_*.sh
 
 # Test conventional commits
 git log --oneline --grep="feat\|fix\|perf"
+
+# Fix formatting issues (run before committing)
+dart format .
+
+# Check if formatting is correct
+dart format --output=none --set-exit-if-changed .
 ```
 
 ## Integration Benefits

@@ -40,11 +40,13 @@ void main() {
       test('should load existing favorites on initialization', () async {
         // Arrange
         final existingFavorites = ['card-1', 'card-2', 'card-3'];
-        final favoritesJson = jsonEncode(existingFavorites.map((id) => {
-          'id': id,
-          'added_date': DateTime.now().toIso8601String(),
-        }).toList());
-        
+        final favoritesJson = jsonEncode(existingFavorites
+            .map((id) => {
+                  'id': id,
+                  'added_date': DateTime.now().toIso8601String(),
+                })
+            .toList());
+
         SharedPreferences.setMockInitialValues({
           'favorites': favoritesJson,
         });
@@ -295,20 +297,23 @@ void main() {
         final prefs = await SharedPreferences.getInstance();
         final favoritesJson = prefs.getString('favorites');
         expect(favoritesJson, isNotNull);
-        
+
         final favoritesList = jsonDecode(favoritesJson!) as List<dynamic>;
-        final favoriteIds = favoritesList.map((item) => item['id'] as String).toList();
+        final favoriteIds =
+            favoritesList.map((item) => item['id'] as String).toList();
         expect(favoriteIds, contains('test-card-1'));
       });
 
       test('should load persisted favorites', () async {
         // Arrange
         final favoriteIds = ['card-1', 'card-2'];
-        final favoritesJson = jsonEncode(favoriteIds.map((id) => {
-          'id': id,
-          'added_date': DateTime.now().toIso8601String(),
-        }).toList());
-        
+        final favoritesJson = jsonEncode(favoriteIds
+            .map((id) => {
+                  'id': id,
+                  'added_date': DateTime.now().toIso8601String(),
+                })
+            .toList());
+
         SharedPreferences.setMockInitialValues({
           'favorites': favoritesJson,
         });

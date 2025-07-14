@@ -11,10 +11,10 @@ void main() {
     setUpAll(() async {
       // Initialize Flutter binding
       TestWidgetsFlutterBinding.ensureInitialized();
-      
+
       // Set up SharedPreferences mock
       SharedPreferences.setMockInitialValues({});
-      
+
       // Initialize ConfigService before running tests
       await ConfigService.initialize();
     });

@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
+    tags: [ 'random-mtg-card-v*' ]
 
 jobs:
   test:
@@ -24,7 +24,12 @@ jobs:
         run: flutter pub get
 
       - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: |
+          if ! dart format --output=none --set-exit-if-changed .; then
+            echo "❌ Code formatting check failed!"
+            echo "Please run 'dart format .' to fix formatting issues."
+            exit 1
+          fi
 
       - name: Analyze project source
         run: flutter analyze
@@ -120,7 +125,7 @@ jobs:
 
   # Build and create release artifacts (only on release tags)
   build-artifacts:
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/random-mtg-card-v')
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
