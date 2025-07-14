@@ -204,4 +204,12 @@ class AppProvider extends ChangeNotifier {
       return false;
     }
   }
+  
+  // Clear all favorites
+  void clearAllFavorites() {
+    _favoriteCards.clear();
+    _favoriteCardIds.clear();
+    _saveFavorites();
+    notifyListeners();
+  }
 } 

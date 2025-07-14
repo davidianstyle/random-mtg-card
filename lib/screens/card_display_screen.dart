@@ -8,7 +8,9 @@ import '../widgets/favorite_indicator.dart';
 import '../widgets/card_metadata_overlay.dart';
 import '../widgets/loading_indicator.dart';
 import '../widgets/error_overlay.dart';
+import '../widgets/menu_overlay.dart';
 import '../services/config_service.dart';
+import '../services/scryfall_service.dart';
 
 class CardDisplayScreen extends StatefulWidget {
   const CardDisplayScreen({super.key});
@@ -19,6 +21,8 @@ class CardDisplayScreen extends StatefulWidget {
 
 class _CardDisplayScreenState extends State<CardDisplayScreen> {
   final ConfigService _config = ConfigService.instance;
+  final ScryfallService _scryfallService = ScryfallService.instance;
+  bool _showMenu = false;
   
   @override
   void initState() {
@@ -50,13 +54,38 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> {
               // Main card display area
               _buildCardArea(appProvider, cardProvider),
               
+              // Menu button (top-left)
+              Positioned(
+                top: 20,
+                left: 20,
+                child: SafeArea(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.menu, color: Colors.white),
+                      onPressed: () {
+                        setState(() {
+                          _showMenu = true;
+                        });
+                      },
+                      tooltip: 'Open menu',
+                    ),
+                  ),
+                ),
+              ),
+              
               // Favorite indicator (top-right)
               if (_config.favoriteIndicator && cardProvider.currentCard != null)
                 Positioned(
                   top: 20,
                   right: 20,
-                  child: FavoriteIndicator(
-                    isFavorite: appProvider.isFavorite(cardProvider.currentCard!.id),
+                  child: SafeArea(
+                    child: FavoriteIndicator(
+                      isFavorite: appProvider.isFavorite(cardProvider.currentCard!.id),
+                    ),
                   ),
                 ),
               
@@ -81,6 +110,16 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> {
                   message: appProvider.errorMessage ?? cardProvider.errorMessage!,
                   onDismiss: () {
                     appProvider.clearError();
+                  },
+                ),
+              
+              // Menu overlay
+              if (_showMenu)
+                MenuOverlay(
+                  onClose: () {
+                    setState(() {
+                      _showMenu = false;
+                    });
                   },
                 ),
             ],

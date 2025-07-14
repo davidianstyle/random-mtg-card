@@ -24,7 +24,8 @@ class ConfigService {
       'enabled': false,
       'sets': <String>[],
       'colors': <String>[],
-      'types': <String>[],
+      'card_types': <String>[],
+      'creature_types': <String>[],
       'rarity': <String>[],
       'format': 'standard',
     },
@@ -73,9 +74,20 @@ class ConfigService {
   
   /// Update a specific configuration value
   Future<void> updateConfig(String path, dynamic value) async {
-    final currentConfig = config;
+    final currentConfig = Map<String, dynamic>.from(config);
+    _deepCopyMap(currentConfig);
     _setNestedValue(currentConfig, path, value);
     await saveConfig(currentConfig);
+  }
+  
+  /// Deep copy a map to make it fully mutable
+  void _deepCopyMap(Map<String, dynamic> map) {
+    map.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        map[key] = Map<String, dynamic>.from(value);
+        _deepCopyMap(map[key]);
+      }
+    });
   }
   
   /// Get a specific configuration value
@@ -96,7 +108,8 @@ class ConfigService {
   bool get filtersEnabled => getValue('filters.enabled', false);
   List<String> get filterSets => List<String>.from(getValue('filters.sets', <String>[]));
   List<String> get filterColors => List<String>.from(getValue('filters.colors', <String>[]));
-  List<String> get filterTypes => List<String>.from(getValue('filters.types', <String>[]));
+  List<String> get filterCardTypes => List<String>.from(getValue('filters.card_types', <String>[]));
+  List<String> get filterCreatureTypes => List<String>.from(getValue('filters.creature_types', <String>[]));
   List<String> get filterRarity => List<String>.from(getValue('filters.rarity', <String>[]));
   String get filterFormat => getValue('filters.format', 'standard');
   
