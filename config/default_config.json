@@ -1,0 +1,33 @@
+{
+  "display": {
+    "fullscreen": true,
+    "resolution": [600, 1024],
+    "orientation": "portrait",
+    "auto_refresh_interval": 30,
+    "show_metadata_on_tap": true,
+    "metadata_auto_hide_delay": 3
+  },
+  "filters": {
+    "enabled": false,
+    "sets": [],
+    "colors": [],
+    "types": [],
+    "rarity": [],
+    "format": "standard"
+  },
+  "features": {
+    "favorites": true,
+    "favorite_indicator": true,
+    "swipe_navigation": true,
+    "double_tap_favorite": true,
+    "tap_metadata_toggle": true,
+    "long_press_details": true,
+    "offline_mode": false
+  },
+  "api": {
+    "base_url": "https://api.scryfall.com",
+    "timeout": 10,
+    "retry_attempts": 3,
+    "cache_images": true
+  }
+} 

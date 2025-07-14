@@ -1,0 +1,107 @@
+name: random_mtg_card
+description: A cross-platform MTG card display app with gesture navigation for Windows, MacOS, and Linux
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # HTTP client for Scryfall API
+  http: ^1.1.0
+  
+  # JSON handling
+  json_annotation: ^4.8.1
+  
+  # Image caching and loading
+  cached_network_image: ^3.3.0
+  
+  # State management
+  provider: ^6.1.1
+  
+  # Local storage for favorites and config
+  shared_preferences: ^2.2.2
+  
+  # Path handling
+  path_provider: ^2.1.1
+  
+  # Window management for desktop platforms
+  window_manager: ^0.3.7
+  
+  # Gesture handling utilities
+  flutter_gesture_detector: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Testing utilities
+  mockito: ^5.4.2
+  build_runner: ^2.4.7
+  
+  # Code generation
+  json_serializable: ^6.7.1
+  
+  # Linting
+  flutter_lints: ^3.0.0
+  
+  # Integration testing
+  integration_test:
+    sdk: flutter
+  
+  # Widget testing utilities
+  flutter_driver:
+    sdk: flutter
+  
+  # HTTP mocking for tests
+  http_mock_adapter: ^0.6.0
+  
+  # Test utilities
+  test: ^1.24.0
+  
+  # Platform detection for tests
+  platform: ^3.1.0
+  
+  # Fake async for testing
+  fake_async: ^1.3.1
+
+flutter:
+  uses-material-design: true
+  
+  # App icons for different platforms
+  assets:
+    - assets/icons/
+    - assets/images/
+  
+  # Custom fonts (optional)
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: fonts/Roboto-Regular.ttf
+  #       - asset: fonts/Roboto-Bold.ttf
+  #         weight: 700
+
+# Platform-specific configuration
+platforms:
+  windows:
+    # Windows specific settings
+    plugins:
+      window_manager:
+        path: packages/window_manager
+  
+  macos:
+    # MacOS specific settings
+    plugins:
+      window_manager:
+        path: packages/window_manager
+  
+  linux:
+    # Linux specific settings
+    plugins:
+      window_manager:
+        path: packages/window_manager 
