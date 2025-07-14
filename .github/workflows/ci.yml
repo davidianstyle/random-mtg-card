@@ -62,6 +62,12 @@ jobs:
       - name: Generate code
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libblkid-dev liblzma-dev
+
       - name: Enable platform (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: flutter config --enable-linux-desktop
