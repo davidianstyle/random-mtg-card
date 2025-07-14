@@ -194,6 +194,7 @@ feat!: redesign settings configuration format
 - **Build failures**: Check platform-specific dependencies
 - **Invalid previous_tag parameter**: Manifest version doesn't match existing git tags - reset manifest to `0.0.0` for new repos
 - **⚠️ Formatting check failures**: Always run `dart format .` before committing - CI has strict formatting requirements
+- **Build artifacts not triggering**: Release Please creates tags with GITHUB_TOKEN which doesn't trigger other workflows - use `release` event instead of `push` with tags
 - **"GitHub Actions is not permitted to create or approve pull requests"**: Repository settings need to allow Actions to create PRs
   - Go to Settings → Actions → General → Workflow permissions
   - Enable "Allow GitHub Actions to create and approve pull requests"

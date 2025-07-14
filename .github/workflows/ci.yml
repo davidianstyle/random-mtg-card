@@ -5,7 +5,8 @@ on:
     branches: [ main ]
   push:
     branches: [ main ]
-    tags: [ 'random-mtg-card-v*' ]
+  release:
+    types: [ published ]
 
 jobs:
   test:
@@ -123,9 +124,9 @@ jobs:
           export DISPLAY=:99
           flutter test test/integration/
 
-  # Build and create release artifacts (only on release tags)
+  # Build and create release artifacts (only on releases)
   build-artifacts:
-    if: startsWith(github.ref, 'refs/tags/random-mtg-card-v')
+    if: github.event_name == 'release'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
