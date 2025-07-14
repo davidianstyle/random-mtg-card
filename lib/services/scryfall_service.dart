@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/mtg_card.dart';
@@ -27,7 +28,7 @@ class ScryfallService {
   DateTime _lastRequestTime = DateTime.now();
 
   // Cache for filter options to avoid repeated API calls
-  Map<String, List<FilterOption>> _filterCache = {};
+  final Map<String, List<FilterOption>> _filterCache = {};
 
   /// Get a random MTG card
   Future<MTGCard?> getRandomCard() async {
@@ -41,11 +42,11 @@ class ScryfallService {
         final json = jsonDecode(response.body);
         return MTGCard.fromJson(json);
       } else {
-        print('Error fetching random card: ${response.statusCode}');
+        debugPrint('Error fetching random card: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Exception fetching random card: $e');
+      debugPrint('Exception fetching random card: $e');
       return null;
     }
   }
@@ -100,11 +101,11 @@ class ScryfallService {
         final data = json['data'] as List;
         return data.map((cardJson) => MTGCard.fromJson(cardJson)).toList();
       } else {
-        print('Error searching cards: ${response.statusCode}');
+        debugPrint('Error searching cards: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Exception searching cards: $e');
+      debugPrint('Exception searching cards: $e');
       return [];
     }
   }
@@ -121,11 +122,11 @@ class ScryfallService {
         final json = jsonDecode(response.body);
         return MTGCard.fromJson(json);
       } else {
-        print('Error fetching card $id: ${response.statusCode}');
+        debugPrint('Error fetching card $id: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Exception fetching card $id: $e');
+      debugPrint('Exception fetching card $id: $e');
       return null;
     }
   }
@@ -142,11 +143,11 @@ class ScryfallService {
         final json = jsonDecode(response.body);
         return List<Map<String, dynamic>>.from(json['data']);
       } else {
-        print('Error fetching sets: ${response.statusCode}');
+        debugPrint('Error fetching sets: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Exception fetching sets: $e');
+      debugPrint('Exception fetching sets: $e');
       return [];
     }
   }
@@ -176,7 +177,7 @@ class ScryfallService {
         return getRandomCard();
       }
     } catch (e) {
-      print('Exception getting filtered random card: $e');
+      debugPrint('Exception getting filtered random card: $e');
       // Fallback to regular random card
       return getRandomCard();
     }
@@ -212,11 +213,11 @@ class ScryfallService {
         _filterCache['sets'] = options;
         return options;
       } else {
-        print('Error fetching sets: ${response.statusCode}');
+        debugPrint('Error fetching sets: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Exception fetching sets: $e');
+      debugPrint('Exception fetching sets: $e');
       return [];
     }
   }
@@ -269,11 +270,11 @@ class ScryfallService {
         _filterCache['card_types'] = options;
         return options;
       } else {
-        print('Error fetching card types: ${response.statusCode}');
+        debugPrint('Error fetching card types: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Exception fetching card types: $e');
+      debugPrint('Exception fetching card types: $e');
       return [];
     }
   }
@@ -307,11 +308,11 @@ class ScryfallService {
         _filterCache['creature_types'] = options;
         return options;
       } else {
-        print('Error fetching creature types: ${response.statusCode}');
+        debugPrint('Error fetching creature types: ${response.statusCode}');
         return [];
       }
     } catch (e) {
-      print('Exception fetching creature types: $e');
+      debugPrint('Exception fetching creature types: $e');
       return [];
     }
   }
@@ -419,11 +420,11 @@ class ScryfallService {
           return response;
         }
       } on SocketException {
-        print('Network error, attempt ${attempts + 1}/$maxAttempts');
+        debugPrint('Network error, attempt ${attempts + 1}/$maxAttempts');
       } on HttpException {
-        print('HTTP error, attempt ${attempts + 1}/$maxAttempts');
+        debugPrint('HTTP error, attempt ${attempts + 1}/$maxAttempts');
       } catch (e) {
-        print('Request error: $e, attempt ${attempts + 1}/$maxAttempts');
+        debugPrint('Request error: $e, attempt ${attempts + 1}/$maxAttempts');
       }
 
       attempts++;

@@ -17,33 +17,6 @@ void main() {
     });
 
     group('getRandomCard', () {
-      final mockCardJson = {
-        'id': 'test-id-123',
-        'name': 'Lightning Bolt',
-        'mana_cost': '{R}',
-        'type_line': 'Instant',
-        'oracle_text': 'Lightning Bolt deals 3 damage to any target.',
-        'colors': ['R'],
-        'color_identity': ['R'],
-        'set': 'lea',
-        'set_name': 'Limited Edition Alpha',
-        'rarity': 'common',
-        'artist': 'Christopher Rush',
-        'cmc': 1.0,
-        'power': null,
-        'toughness': null,
-        'collector_number': '162',
-        'released_at': '1993-08-05',
-        'image_uris': {
-          'small': 'https://example.com/small.jpg',
-          'normal': 'https://example.com/normal.jpg',
-          'large': 'https://example.com/large.jpg',
-          'png': 'https://example.com/png.png',
-          'art_crop': 'https://example.com/art_crop.jpg',
-          'border_crop': 'https://example.com/border_crop.jpg',
-        },
-      };
-
       test('should return MTGCard when API call succeeds', () async {
         // Note: This test depends on actual HTTP calls since the service is a singleton
         // In a real implementation, we would need to modify the service to accept a custom client

@@ -129,13 +129,13 @@ class AppProvider extends ChangeNotifier {
               _favoriteCards.add(card);
             } catch (e) {
               // If card data is corrupted, just keep the ID
-              print('Error loading favorite card data: $e');
+              debugPrint('Error loading favorite card data: $e');
             }
           }
         }
       }
     } catch (e) {
-      print('Error loading favorites: $e');
+      debugPrint('Error loading favorites: $e');
     }
   }
 
@@ -163,7 +163,7 @@ class AppProvider extends ChangeNotifier {
       final favoritesJson = jsonEncode(favoritesList);
       await prefs.setString(_favoritesKey, favoritesJson);
     } catch (e) {
-      print('Error saving favorites: $e');
+      debugPrint('Error saving favorites: $e');
     }
   }
 
@@ -200,7 +200,7 @@ class AppProvider extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      print('Error importing favorites: $e');
+      debugPrint('Error importing favorites: $e');
       return false;
     }
   }

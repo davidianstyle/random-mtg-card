@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ConfigService {
@@ -59,7 +60,7 @@ class ConfigService {
         final savedConfig = jsonDecode(configJson) as Map<String, dynamic>;
         return _mergeConfigs(_defaultConfig, savedConfig);
       } catch (e) {
-        print('Error loading config: $e');
+        debugPrint('Error loading config: $e');
         return _defaultConfig;
       }
     }

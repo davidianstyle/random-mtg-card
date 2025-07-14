@@ -9,7 +9,7 @@ class CardProvider extends ChangeNotifier {
   final ConfigService _config = ConfigService.instance;
 
   MTGCard? _currentCard;
-  List<MTGCard> _cardHistory = [];
+  final List<MTGCard> _cardHistory = [];
   int _currentIndex = -1;
   bool _isLoading = false;
   String? _errorMessage;
@@ -202,10 +202,10 @@ class CardProvider extends ChangeNotifier {
       if (nextCard != null) {
         // Cache the next card image
         // This could be implemented with a caching service
-        print('Preloaded next card: ${nextCard.name}');
+        debugPrint('Preloaded next card: ${nextCard.name}');
       }
     } catch (e) {
-      print('Error preloading next card: $e');
+      debugPrint('Error preloading next card: $e');
     }
   }
 

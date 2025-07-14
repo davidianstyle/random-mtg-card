@@ -268,7 +268,7 @@ void main() {
     group('History Management', () {
       test('should limit history size', () {
         // Arrange
-        final maxHistorySize = 50; // Assuming this is the limit
+        const maxHistorySize = 50; // Assuming this is the limit
 
         // Act
         for (int i = 0; i < maxHistorySize + 10; i++) {

@@ -201,7 +201,7 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                 ),
               )
             else
-              Container(
+              SizedBox(
                 height: widget.maxHeight?.toDouble() ?? 300,
                 child: ListView.builder(
                   itemCount: _filteredOptions.length,

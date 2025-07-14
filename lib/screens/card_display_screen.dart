@@ -59,7 +59,7 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> {
                 child: SafeArea(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: IconButton(
@@ -153,7 +153,7 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> {
       onLongPress: _config.longPressDetails
           ? () {
               // TODO: Implement card details view
-              print('Long press detected - show card details');
+              debugPrint('Long press detected - show card details');
             }
           : null,
 
@@ -170,7 +170,7 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> {
             }
           : null,
 
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: cardProvider.currentCard != null
