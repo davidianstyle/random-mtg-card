@@ -9,7 +9,7 @@
 - **Package Name**: `random-mtg-card`
 - **Release Type**: `dart` (Flutter/Dart project)
 - **Version File**: `pubspec.yaml`
-- **Current Version**: `1.0.0`
+- **Current Version**: `0.0.0` (reset to bootstrap initial release)
 - **Manifest File**: `.github/.release-please-manifest.json`
 - **Config File**: `.github/release-please-config.json`
 
@@ -63,12 +63,13 @@
 **File**: `.github/.release-please-manifest.json`
 ```json
 {
-  ".": "1.0.0"
+  ".": "0.0.0"
 }
 ```
 - Tracks current version for the root package
 - Updated automatically by Release Please
 - Required for multi-package repositories
+- **Note**: Reset to `0.0.0` to bootstrap initial release (was `1.0.0` but no corresponding git tag existed)
 
 ### Pubspec.yaml Version Management
 **Extra Files Configuration**:
@@ -124,15 +125,18 @@ feat!: redesign settings configuration format
 ## Current Project State
 
 ### Version History
-- **v1.0.0** (2025-07-14): Initial release with comprehensive feature set
-  - Cross-platform support (Windows, macOS, Linux)
-  - Settings menu with filter configuration
-  - Favorites system with search and sort
-  - Navigation menu with animations
-  - MTG card display with gesture controls
-  - Filter system with Scryfall API integration
-  - Comprehensive testing suite
-  - Professional UI with dark theme
+- **Bootstrap Stage**: Repository configured for automated releases
+  - Release Please manifest reset to `0.0.0` 
+  - Next release will be the initial version based on conventional commits
+  - Features ready for initial release:
+    - Cross-platform support (Windows, macOS, Linux)
+    - Settings menu with filter configuration
+    - Favorites system with search and sort
+    - Navigation menu with animations
+    - MTG card display with gesture controls
+    - Filter system with Scryfall API integration
+    - Comprehensive testing suite
+    - Professional UI with dark theme
 
 ### Key Features Implemented
 - **Settings Menu**: Searchable multi-select filters for sets, colors, types, rarity, formats
@@ -182,6 +186,7 @@ feat!: redesign settings configuration format
 - **Version conflicts**: Ensure manifest.json is updated
 - **Changelog formatting**: Verify conventional commit format
 - **Build failures**: Check platform-specific dependencies
+- **Invalid previous_tag parameter**: Manifest version doesn't match existing git tags - reset manifest to `0.0.0` for new repos
 
 ### Debug Commands
 ```bash
