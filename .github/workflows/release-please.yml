@@ -33,17 +33,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            build-script: ./scripts/build_linux.sh
+            platform: linux
             artifact-name: mtg-card-display-linux
-            artifact-path: build/linux/x64/release/bundle/
           - os: macos-latest
-            build-script: ./scripts/build_macos.sh
+            platform: macos
             artifact-name: mtg-card-display-macos
-            artifact-path: build/macos/Build/Products/Release/random_mtg_card.app
           - os: windows-latest
-            build-script: ./scripts/build_windows.bat
+            platform: windows
             artifact-name: mtg-card-display-windows
-            artifact-path: build/windows/runner/Release/
 
     steps:
       - name: Checkout
@@ -67,49 +64,29 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libblkid-dev liblzma-dev
 
-      - name: Make build script executable (Unix)
-        if: runner.os != 'Windows'
-        run: chmod +x ${{ matrix.build-script }}
+      - name: Enable Flutter platform
+        run: flutter config --enable-${{ matrix.platform }}-desktop
 
       - name: Build application
-        run: ${{ matrix.build-script }} release
-
-      - name: Debug - List build directory (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          echo "Listing build directory structure:"
-          if (Test-Path "build") { Get-ChildItem -Recurse build } else { echo "build directory does not exist" }
+        run: flutter build ${{ matrix.platform }} --release
 
       - name: Create archive (Linux)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.platform == 'linux'
         run: |
           cd build/linux/x64/release/bundle/
           tar -czf ../../../../../mtg-card-display-linux.tar.gz .
 
       - name: Create archive (macOS)
-        if: matrix.os == 'macos-latest'
+        if: matrix.platform == 'macos'
         run: |
           cd build/macos/Build/Products/Release/
           zip -r ../../../../../mtg-card-display-macos.zip random_mtg_card.app
 
       - name: Create archive (Windows)
-        if: matrix.os == 'windows-latest'
+        if: matrix.platform == 'windows'
         run: |
-          # Check for different possible Flutter build output locations
-          if (Test-Path "build/windows/x64/runner/Release") {
-            echo "Found build output at: build/windows/x64/runner/Release"
-            cd build/windows/x64/runner/Release/
-            7z a ../../../../../mtg-card-display-windows.zip .
-          } elseif (Test-Path "build/windows/runner/Release") {
-            echo "Found build output at: build/windows/runner/Release"
-            cd build/windows/runner/Release/
-            7z a ../../../../mtg-card-display-windows.zip .
-          } else {
-            echo "Error: Could not find Windows build output directory"
-            echo "Available directories:"
-            Get-ChildItem -Recurse build/windows/ -Directory
-            exit 1
-          }
+          cd build/windows/x64/runner/Release/
+          7z a ../../../../../mtg-card-display-windows.zip .
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1

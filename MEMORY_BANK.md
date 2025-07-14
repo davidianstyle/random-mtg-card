@@ -39,12 +39,19 @@
    - Depends on `release-please` job completion
 
 ### Cross-Platform Build Integration
-**Build Scripts**:
+
+**Local Development Scripts** (for developer convenience):
 - `./scripts/build_linux.sh` → `mtg-card-display-linux.tar.gz`
 - `./scripts/build_macos.sh` → `mtg-card-display-macos.zip`
 - `./scripts/build_windows.bat` → `mtg-card-display-windows.zip`
+- `./scripts/build_universal.sh` → Auto-detects platform and builds
 
-**Artifact Paths**:
+**CI/Release Builds** (GitHub Actions):
+- Uses direct Flutter commands: `flutter build <platform> --release`
+- Simplified and more reliable than shell scripts
+- Consistent across all platforms
+
+**Standard Flutter Output Paths**:
 - Linux: `build/linux/x64/release/bundle/`
 - macOS: `build/macos/Build/Products/Release/random_mtg_card.app`
 - Windows: `build/windows/x64/runner/Release/`
@@ -184,6 +191,7 @@ feat!: redesign settings configuration format
 4. **Test thoroughly** before submitting PRs
 5. **Update documentation** for API changes
 6. **⚠️ ALWAYS run `dart format .` before committing** - CI fails if files are not properly formatted
+7. **Use build scripts for local development** - `./scripts/build_universal.sh` auto-detects platform and builds locally
 
 ### For Maintainers
 1. **Review commit messages** during PR review
@@ -239,6 +247,17 @@ dart format .
 
 # Check if formatting is correct
 dart format --output=none --set-exit-if-changed .
+
+# Build locally (development)
+./scripts/build_universal.sh release  # Auto-detects platform
+./scripts/build_linux.sh debug       # Linux-specific 
+./scripts/build_macos.sh release     # macOS-specific
+./scripts/build_windows.bat debug    # Windows-specific
+
+# Build manually (same as CI)
+flutter config --enable-linux-desktop && flutter build linux --release
+flutter config --enable-macos-desktop && flutter build macos --release 
+flutter config --enable-windows-desktop && flutter build windows --release
 ```
 
 ## Integration Benefits
@@ -267,10 +286,12 @@ dart format --output=none --set-exit-if-changed .
 ### Workflow Integration (Final Approach)
 - **CI Workflow** (`ci.yml`): Handles testing, code quality, and build verification for PRs/pushes
 - **Release Workflow** (`release-please.yml`): Handles both release creation AND artifact building in single workflow
+- **Local Development**: Build scripts preserved for developer convenience and local testing
 - **Key Benefits**:
-  - Simplified architecture with release + build in one place
+  - Simplified CI architecture with release + build in one place
   - Proper job dependencies (`build-artifacts` needs `release-please`)
   - Automatic artifact attachment to GitHub releases
   - No complex cross-workflow triggering issues
+  - Local scripts available for development workflow
 
 This Release Please setup provides a complete, professional release management system that scales with the project while maintaining high quality standards and developer productivity. 

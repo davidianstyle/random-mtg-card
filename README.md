@@ -45,9 +45,11 @@ flutter pub get
 # Generate code
 flutter packages pub run build_runner build
 
-# Build for your platform
+# Build for your platform (local development)
 ./scripts/build_universal.sh release
 ```
+
+> **Note**: The build scripts are provided for local development convenience. Our CI/CD pipeline uses direct Flutter commands for more reliable automated builds.
 
 ### Platform-Specific Instructions
 
