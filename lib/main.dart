@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -8,22 +9,126 @@ import 'providers/app_provider.dart';
 import 'providers/card_provider.dart';
 import 'screens/card_display_screen.dart';
 import 'services/config_service.dart';
+import 'services/service_locator.dart';
+import 'services/cache_service.dart';
+import 'services/scryfall_service.dart';
+import 'utils/logger.dart';
+import 'utils/performance_monitor.dart';
+import 'utils/config_validator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize configuration first
+  try {
+    // Initialize enhanced services
+    await _initializeEnhancedServices();
+
+    // Initialize window manager for desktop platforms
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      await windowManager.ensureInitialized();
+      await _configureWindow();
+    }
+
+    Logger.instance.info('Application initialized successfully');
+    runApp(const MTGCardDisplayApp());
+  } catch (e, stackTrace) {
+    // Fallback error handling if logger isn't initialized
+    debugPrint('Fatal error during initialization: $e');
+    debugPrint('Stack trace: $stackTrace');
+    
+    // Show error dialog or fallback UI
+    runApp(ErrorApp(error: e.toString()));
+  }
+}
+
+Future<void> _initializeEnhancedServices() async {
+  // Initialize logger first
+  await Logger.initialize(
+    minLevel: kDebugMode ? LogLevel.debug : LogLevel.info,
+    enableFileLogging: true,
+    enableConsoleLogging: true,
+  );
+
+  Logger.instance.info('Starting application initialization');
+
+  // Initialize configuration service first
   await ConfigService.initialize();
 
-  // Initialize window manager for desktop platforms
-  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-    await windowManager.ensureInitialized();
+  // Initialize service locator and register services
+  await ServiceConfig.setupDependencies();
 
-    // Configure window based on platform
-    await _configureWindow();
+  // Initialize cache service
+  final cacheService = await CacheService.create();
+  ServiceLocator.instance.registerSingleton<CacheService>(cacheService);
+
+  // Initialize Scryfall service
+  final scryfallService = ScryfallService.instance;
+  await scryfallService.initialize();
+  ServiceLocator.instance.registerSingleton<ScryfallService>(scryfallService);
+
+  // Enable performance monitoring
+  PerformanceMonitor.instance.enable();
+
+  Logger.instance.info('Enhanced services initialized successfully');
+}
+
+// Error app for initialization failures
+class ErrorApp extends StatelessWidget {
+  final String error;
+
+  const ErrorApp({super.key, required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'MTG Card Display - Error',
+      theme: ThemeData.dark(),
+      home: Scaffold(
+        backgroundColor: Colors.red[900],
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.white,
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Application Failed to Start',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  error,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  onPressed: () {
+                    // Restart the app
+                    exit(0);
+                  },
+                  child: const Text('Restart App'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
-
-  runApp(const MTGCardDisplayApp());
 }
 
 Future<void> _configureWindow() async {

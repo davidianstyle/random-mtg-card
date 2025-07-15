@@ -239,7 +239,7 @@ class FileLogHandler extends LogHandler {
     await _currentLogFile!.rename(rotatedFile.path);
     
     // Create new log file
-    _currentLogFile = File(path.join(_logDirectory, '${baseName}.log'));
+    _currentLogFile = File(path.join(_logDirectory, '$baseName.log'));
     _logSink = _currentLogFile!.openWrite();
   }
 
@@ -267,8 +267,8 @@ class FileLogHandler extends LogHandler {
   }
 }
 
-// Extension for easier logging in any class
-extension LoggerExtension on Object {
+// Mixin for easier logging in any class
+mixin LoggerExtension {
   Logger get logger => Logger.instance;
   
   void logDebug(String message, {Map<String, dynamic>? context}) {

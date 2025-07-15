@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'logger.dart';
@@ -134,8 +132,9 @@ class FrameTimingTracker {
   double get averageFrameRate {
     if (_frameTimes.isEmpty) return 0;
     
-    final avgFrameTime = _frameTimes.reduce((a, b) => a + b) / _frameTimes.length;
-    return avgFrameTime.inMilliseconds > 0 ? 1000 / avgFrameTime.inMilliseconds : 0;
+    final totalMicroseconds = _frameTimes.fold(0, (sum, duration) => sum + duration.inMicroseconds);
+    final avgMicroseconds = totalMicroseconds / _frameTimes.length;
+    return avgMicroseconds > 0 ? 1000000 / avgMicroseconds : 0;
   }
 
   Duration get averageFrameTime {
@@ -376,7 +375,7 @@ class PerformanceMonitor {
         ? _frameTracker.droppedFrames / _frameTracker.totalFrames 
         : 0;
     
-    return (dropRate * 100).clamp(0, 100);
+    return (dropRate * 100).clamp(0, 100).toDouble();
   }
 
   // Get slowest operations
@@ -407,7 +406,7 @@ class PerformanceMonitor {
 }
 
 // Extensions for easy performance monitoring
-extension PerformanceExtensions on Future<T> {
+extension PerformanceExtensions<T> on Future<T> {
   Future<T> timed(String name, PerformanceEventType type, {Map<String, dynamic>? metadata}) {
     return PerformanceMonitor.instance.timeOperation(name, type, () => this, metadata: metadata);
   }

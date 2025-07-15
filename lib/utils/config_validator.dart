@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:meta/meta.dart';
 import 'result.dart';
 
 // Configuration validation result
@@ -180,7 +179,7 @@ class ApiConfigValidator extends ConfigValidator {
     // Validate base_url
     if (config.containsKey('base_url')) {
       final baseUrl = config['base_url'];
-      if (baseUrl is! String || !Uri.tryParse(baseUrl)?.hasScheme == true) {
+      if (baseUrl is! String || Uri.tryParse(baseUrl)?.hasScheme != true) {
         errors.add('base_url must be a valid URL');
       } else if (!baseUrl.startsWith('https://')) {
         warnings.add('base_url should use HTTPS for security');
@@ -435,7 +434,7 @@ class EnhancedConfigService {
   EnhancedConfigService._();
 
   final ConfigurationValidator _validator = ConfigurationValidator();
-  Map<String, dynamic>? _cachedConfig;
+
 
   Result<Map<String, dynamic>> loadAndValidateConfiguration(String configJson) {
     try {

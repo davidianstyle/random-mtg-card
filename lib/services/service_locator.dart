@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../utils/logger.dart';
+import 'config_service.dart';
 
 typedef ServiceFactory<T> = T Function();
 
@@ -117,20 +118,11 @@ class ServiceConfig {
   static Future<void> setupDependencies() async {
     final locator = ServiceLocator.instance;
     
-    // Initialize logger first
-    await Logger.initialize(
-      minLevel: kDebugMode ? LogLevel.debug : LogLevel.info,
-      enableFileLogging: true,
-      enableConsoleLogging: true,
-    );
-    
     // Register core services
     locator.registerSingleton<Logger>(Logger.instance);
     
-    // Register your services here
-    // Example:
-    // locator.registerLazySingleton<ConfigService>(() => ConfigService());
-    // locator.registerLazySingleton<ScryfallService>(() => ScryfallService());
+    // Register configuration service
+    locator.registerSingleton<ConfigService>(ConfigService.instance);
     
     Logger.instance.info('Dependencies configured');
   }

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../models/mtg_card.dart';
+import '../utils/logger.dart';
+import '../utils/performance_monitor.dart';
 
-class CardWidget extends StatelessWidget {
+class CardWidget extends StatelessWidget with LoggerExtension, PerformanceMonitoring {
   final MTGCard? card;
 
   const CardWidget({
@@ -18,22 +20,26 @@ class CardWidget extends StatelessWidget {
     }
 
     return Center(
-      child: Container(
-        width: 540,
-        height: 756,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: _buildCardImage(),
+      child: Semantics(
+        label: 'Magic: The Gathering card: ${card!.name}',
+        hint: 'Card of type ${card!.typeLine}${card!.manaCost != null ? ' with mana cost ${card!.manaCost}' : ''}',
+        child: Container(
+          width: 540,
+          height: 756,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: _buildCardImage(),
+          ),
         ),
       ),
     );
@@ -43,14 +49,29 @@ class CardWidget extends StatelessWidget {
     final imageUrl = card!.bestImageUrl;
 
     if (imageUrl == null) {
+      logWarning('No image URL available for card', context: {
+        'card_id': card!.id,
+        'card_name': card!.name,
+      });
       return _buildPlaceholder();
     }
+
+    logDebug('Loading card image', context: {
+      'card_id': card!.id,
+      'image_url': imageUrl,
+    });
 
     return CachedNetworkImage(
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       placeholder: (context, url) => _buildLoadingPlaceholder(),
-      errorWidget: (context, url, error) => _buildErrorPlaceholder(),
+      errorWidget: (context, url, error) {
+        logError('Failed to load card image', error: error, context: {
+          'card_id': card!.id,
+          'image_url': url,
+        });
+        return _buildErrorPlaceholder();
+      },
       memCacheWidth: 540,
       memCacheHeight: 756,
       maxWidthDiskCache: 540,
@@ -94,42 +115,46 @@ class CardWidget extends StatelessWidget {
   }
 
   Widget _buildNoCardPlaceholder() {
-    return Container(
-      width: 540,
-      height: 756,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.grey.shade800.withValues(alpha: 0.9),
-            Colors.grey.shade900.withValues(alpha: 0.9),
-          ],
+    return Semantics(
+      label: 'No card available',
+      hint: 'No Magic: The Gathering card is currently loaded',
+      child: Container(
+        width: 540,
+        height: 756,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.grey.shade800.withValues(alpha: 0.9),
+              Colors.grey.shade900.withValues(alpha: 0.9),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.grey.shade600,
+            width: 1,
+          ),
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.shade600,
-          width: 1,
-        ),
-      ),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.help_outline,
-              size: 48,
-              color: Colors.white54,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'No card to display',
-              style: TextStyle(
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.help_outline,
+                size: 48,
                 color: Colors.white54,
-                fontSize: 16,
               ),
-            ),
-          ],
+              SizedBox(height: 16),
+              Text(
+                'No card to display',
+                style: TextStyle(
+                  color: Colors.white54,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

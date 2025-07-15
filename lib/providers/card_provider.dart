@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 import '../models/mtg_card.dart';
 import '../services/scryfall_service.dart';
 import '../services/config_service.dart';
+import '../services/service_locator.dart';
+import '../utils/logger.dart';
+import '../utils/performance_monitor.dart';
 
-class CardProvider extends ChangeNotifier {
-  final ScryfallService _scryfallService = ScryfallService.instance;
-  final ConfigService _config = ConfigService.instance;
+
+class CardProvider extends ChangeNotifier with LoggerExtension, PerformanceMonitoring {
+  late final ScryfallService _scryfallService;
+  late final ConfigService _config;
 
   MTGCard? _currentCard;
   final List<MTGCard> _cardHistory = [];
@@ -30,26 +34,48 @@ class CardProvider extends ChangeNotifier {
 
   // Initialize and load first card
   Future<void> initialize() async {
-    await loadRandomCard();
+    try {
+      // Get services from service locator
+      _scryfallService = getService<ScryfallService>();
+      _config = getService<ConfigService>();
+      
+      logInfo('Card provider initialized');
+      await loadRandomCard();
+    } catch (e, stackTrace) {
+      logError('Failed to initialize card provider', error: e, stackTrace: stackTrace);
+      _setError('Failed to initialize card provider');
+    }
   }
 
   // Load a new random card
   Future<void> loadRandomCard() async {
-    _setLoading(true);
-    _clearError();
+    return timeAsync('loadRandomCard', () async {
+      _setLoading(true);
+      _clearError();
 
-    try {
-      final card = await _scryfallService.getRandomCardWithFilters();
-      if (card != null) {
-        _setCurrentCard(card);
-      } else {
-        _setError('Failed to load card');
+      try {
+        logDebug('Loading random card');
+        final card = await _scryfallService.getRandomCardWithFilters();
+        
+        if (card != null) {
+          _setCurrentCard(card);
+          logInfo('Random card loaded successfully', context: {
+            'card_id': card.id,
+            'card_name': card.name,
+          });
+        } else {
+          const errorMessage = 'Failed to load random card';
+          _setError(errorMessage);
+          logError(errorMessage);
+        }
+      } catch (e, stackTrace) {
+        final errorMessage = 'Unexpected error loading random card: $e';
+        _setError(errorMessage);
+        logError(errorMessage, error: e, stackTrace: stackTrace);
+      } finally {
+        _setLoading(false);
       }
-    } catch (e) {
-      _setError('Error loading card: $e');
-    } finally {
-      _setLoading(false);
-    }
+    });
   }
 
   // Navigate to previous card
@@ -78,21 +104,37 @@ class CardProvider extends ChangeNotifier {
 
   // Load a specific card by ID
   Future<void> loadCard(String cardId) async {
-    _setLoading(true);
-    _clearError();
+    return timeAsync('loadCard', () async {
+      _setLoading(true);
+      _clearError();
 
-    try {
-      final card = await _scryfallService.getCard(cardId);
-      if (card != null) {
-        _setCurrentCard(card);
-      } else {
-        _setError('Card not found');
+      try {
+        logDebug('Loading specific card', context: {'card_id': cardId});
+        final card = await _scryfallService.getCard(cardId);
+        
+        if (card != null) {
+          _setCurrentCard(card);
+          logInfo('Card loaded successfully', context: {
+            'card_id': card.id,
+            'card_name': card.name,
+          });
+        } else {
+          const errorMessage = 'Failed to load card';
+          _setError(errorMessage);
+          logError(errorMessage, context: {
+            'card_id': cardId,
+          });
+        }
+      } catch (e, stackTrace) {
+        final errorMessage = 'Unexpected error loading card: $e';
+        _setError(errorMessage);
+        logError(errorMessage, error: e, stackTrace: stackTrace, context: {
+          'card_id': cardId,
+        });
+      } finally {
+        _setLoading(false);
       }
-    } catch (e) {
-      _setError('Error loading card: $e');
-    } finally {
-      _setLoading(false);
-    }
+    });
   }
 
   // Refresh current card (reload from API)

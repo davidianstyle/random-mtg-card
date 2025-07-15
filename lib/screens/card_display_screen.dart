@@ -10,6 +10,9 @@ import '../widgets/loading_indicator.dart';
 import '../widgets/error_overlay.dart';
 import '../widgets/menu_overlay.dart';
 import '../services/config_service.dart';
+import '../services/service_locator.dart';
+import '../utils/logger.dart';
+import '../utils/performance_monitor.dart';
 
 class CardDisplayScreen extends StatefulWidget {
   const CardDisplayScreen({super.key});
@@ -18,27 +21,45 @@ class CardDisplayScreen extends StatefulWidget {
   State<CardDisplayScreen> createState() => _CardDisplayScreenState();
 }
 
-class _CardDisplayScreenState extends State<CardDisplayScreen> {
-  final ConfigService _config = ConfigService.instance;
+class _CardDisplayScreenState extends State<CardDisplayScreen> with LoggerExtension, PerformanceMonitoring {
+  late final ConfigService _config;
   bool _showMenu = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeProviders();
+    try {
+      _config = getService<ConfigService>();
+      _initializeProviders();
+    } catch (e, stackTrace) {
+      logError('Failed to initialize card display screen', error: e, stackTrace: stackTrace);
+    }
   }
 
   Future<void> _initializeProviders() async {
-    final appProvider = Provider.of<AppProvider>(context, listen: false);
-    final cardProvider = Provider.of<CardProvider>(context, listen: false);
+    return timeAsync('initializeProviders', () async {
+      try {
+        logInfo('Initializing card display screen providers');
+        
+        final appProvider = Provider.of<AppProvider>(context, listen: false);
+        final cardProvider = Provider.of<CardProvider>(context, listen: false);
 
-    await appProvider.initialize();
-    await cardProvider.initialize();
+        await appProvider.initialize();
+        await cardProvider.initialize();
 
-    // Start auto-refresh if configured
-    if (_config.autoRefreshInterval > 0) {
-      cardProvider.startAutoRefresh();
-    }
+        // Start auto-refresh if configured
+        if (_config.autoRefreshInterval > 0) {
+          cardProvider.startAutoRefresh();
+          logInfo('Auto-refresh enabled', context: {
+            'interval_seconds': _config.autoRefreshInterval,
+          });
+        }
+        
+        logInfo('Card display screen providers initialized successfully');
+      } catch (e, stackTrace) {
+        logError('Failed to initialize providers', error: e, stackTrace: stackTrace);
+      }
+    });
   }
 
   @override
@@ -110,7 +131,9 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> {
                   message:
                       appProvider.errorMessage ?? cardProvider.errorMessage!,
                   onDismiss: () {
+                    logDebug('Error overlay dismissed');
                     appProvider.clearError();
+                    cardProvider.clearError();
                   },
                 ),
 
