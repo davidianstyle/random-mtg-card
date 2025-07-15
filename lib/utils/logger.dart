@@ -37,14 +37,14 @@ class LogEntry {
   });
 
   Map<String, dynamic> toJson() => {
-    'timestamp': timestamp.toIso8601String(),
-    'level': level.name,
-    'message': message,
-    if (component != null) 'component': component,
-    if (context != null) 'context': context,
-    if (error != null) 'error': error.toString(),
-    if (stackTrace != null) 'stackTrace': stackTrace.toString(),
-  };
+        'timestamp': timestamp.toIso8601String(),
+        'level': level.name,
+        'message': message,
+        if (component != null) 'component': component,
+        if (context != null) 'context': context,
+        if (error != null) 'error': error.toString(),
+        if (stackTrace != null) 'stackTrace': stackTrace.toString(),
+      };
 
   @override
   String toString() {
@@ -71,7 +71,8 @@ class Logger {
 
   LogLevel _minLevel = kDebugMode ? LogLevel.debug : LogLevel.info;
   final List<LogHandler> _handlers = [];
-  final StreamController<LogEntry> _logStream = StreamController<LogEntry>.broadcast();
+  final StreamController<LogEntry> _logStream =
+      StreamController<LogEntry>.broadcast();
 
   Stream<LogEntry> get logStream => _logStream.stream;
 
@@ -133,24 +134,44 @@ class Logger {
     }
   }
 
-  void debug(String message, {String? component, Map<String, dynamic>? context}) {
+  void debug(String message,
+      {String? component, Map<String, dynamic>? context}) {
     log(LogLevel.debug, message, component: component, context: context);
   }
 
-  void info(String message, {String? component, Map<String, dynamic>? context}) {
+  void info(String message,
+      {String? component, Map<String, dynamic>? context}) {
     log(LogLevel.info, message, component: component, context: context);
   }
 
-  void warning(String message, {String? component, Map<String, dynamic>? context, Object? error}) {
-    log(LogLevel.warning, message, component: component, context: context, error: error);
+  void warning(String message,
+      {String? component, Map<String, dynamic>? context, Object? error}) {
+    log(LogLevel.warning, message,
+        component: component, context: context, error: error);
   }
 
-  void error(String message, {String? component, Map<String, dynamic>? context, Object? error, StackTrace? stackTrace}) {
-    log(LogLevel.error, message, component: component, context: context, error: error, stackTrace: stackTrace);
+  void error(String message,
+      {String? component,
+      Map<String, dynamic>? context,
+      Object? error,
+      StackTrace? stackTrace}) {
+    log(LogLevel.error, message,
+        component: component,
+        context: context,
+        error: error,
+        stackTrace: stackTrace);
   }
 
-  void critical(String message, {String? component, Map<String, dynamic>? context, Object? error, StackTrace? stackTrace}) {
-    log(LogLevel.critical, message, component: component, context: context, error: error, stackTrace: stackTrace);
+  void critical(String message,
+      {String? component,
+      Map<String, dynamic>? context,
+      Object? error,
+      StackTrace? stackTrace}) {
+    log(LogLevel.critical, message,
+        component: component,
+        context: context,
+        error: error,
+        stackTrace: stackTrace);
   }
 
   void dispose() {
@@ -203,7 +224,7 @@ class FileLogHandler extends LogHandler {
     final appDir = await getApplicationDocumentsDirectory();
     final logDir = path.join(appDir.path, 'logs');
     await Directory(logDir).create(recursive: true);
-    
+
     final handler = FileLogHandler._(logDir, maxFiles, maxSizeMB);
     await handler._initializeLogFile();
     return handler;
@@ -211,9 +232,10 @@ class FileLogHandler extends LogHandler {
 
   Future<void> _initializeLogFile() async {
     final now = DateTime.now();
-    final filename = 'app_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}.log';
+    final filename =
+        'app_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}.log';
     _currentLogFile = File(path.join(_logDirectory, filename));
-    
+
     // Rotate if file is too large
     if (await _currentLogFile!.exists()) {
       final size = await _currentLogFile!.length();
@@ -221,23 +243,24 @@ class FileLogHandler extends LogHandler {
         await _rotateLogFile();
       }
     }
-    
+
     _logSink = _currentLogFile!.openWrite(mode: FileMode.append);
     await _cleanupOldLogs();
   }
 
   Future<void> _rotateLogFile() async {
     if (_currentLogFile == null) return;
-    
+
     final now = DateTime.now();
-    final timestamp = '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
+    final timestamp =
+        '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
     final baseName = path.basenameWithoutExtension(_currentLogFile!.path);
     final rotatedName = '${baseName}_$timestamp.log';
     final rotatedFile = File(path.join(_logDirectory, rotatedName));
-    
+
     await _logSink?.close();
     await _currentLogFile!.rename(rotatedFile.path);
-    
+
     // Create new log file
     _currentLogFile = File(path.join(_logDirectory, '$baseName.log'));
     _logSink = _currentLogFile!.openWrite();
@@ -245,11 +268,16 @@ class FileLogHandler extends LogHandler {
 
   Future<void> _cleanupOldLogs() async {
     final logDir = Directory(_logDirectory);
-    final files = await logDir.list().where((entity) => entity is File && entity.path.endsWith('.log')).cast<File>().toList();
-    
+    final files = await logDir
+        .list()
+        .where((entity) => entity is File && entity.path.endsWith('.log'))
+        .cast<File>()
+        .toList();
+
     if (files.length > _maxFiles) {
-      files.sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
-      
+      files
+          .sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
+
       for (int i = 0; i < files.length - _maxFiles; i++) {
         await files[i].delete();
       }
@@ -270,24 +298,36 @@ class FileLogHandler extends LogHandler {
 // Mixin for easier logging in any class
 mixin LoggerExtension {
   Logger get logger => Logger.instance;
-  
+
   void logDebug(String message, {Map<String, dynamic>? context}) {
     logger.debug(message, component: runtimeType.toString(), context: context);
   }
-  
+
   void logInfo(String message, {Map<String, dynamic>? context}) {
     logger.info(message, component: runtimeType.toString(), context: context);
   }
-  
-  void logWarning(String message, {Map<String, dynamic>? context, Object? error}) {
-    logger.warning(message, component: runtimeType.toString(), context: context, error: error);
+
+  void logWarning(String message,
+      {Map<String, dynamic>? context, Object? error}) {
+    logger.warning(message,
+        component: runtimeType.toString(), context: context, error: error);
   }
-  
-  void logError(String message, {Map<String, dynamic>? context, Object? error, StackTrace? stackTrace}) {
-    logger.error(message, component: runtimeType.toString(), context: context, error: error, stackTrace: stackTrace);
+
+  void logError(String message,
+      {Map<String, dynamic>? context, Object? error, StackTrace? stackTrace}) {
+    logger.error(message,
+        component: runtimeType.toString(),
+        context: context,
+        error: error,
+        stackTrace: stackTrace);
   }
-  
-  void logCritical(String message, {Map<String, dynamic>? context, Object? error, StackTrace? stackTrace}) {
-    logger.critical(message, component: runtimeType.toString(), context: context, error: error, stackTrace: stackTrace);
+
+  void logCritical(String message,
+      {Map<String, dynamic>? context, Object? error, StackTrace? stackTrace}) {
+    logger.critical(message,
+        component: runtimeType.toString(),
+        context: context,
+        error: error,
+        stackTrace: stackTrace);
   }
-} 
+}

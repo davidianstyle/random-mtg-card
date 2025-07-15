@@ -35,7 +35,7 @@ void main() async {
     // Fallback error handling if logger isn't initialized
     debugPrint('Fatal error during initialization: $e');
     debugPrint('Stack trace: $stackTrace');
-    
+
     // Show error dialog or fallback UI
     runApp(ErrorApp(error: e.toString()));
   }

@@ -43,21 +43,21 @@ class ValidationResult {
     final buffer = StringBuffer();
     buffer.writeln('ValidationResult:');
     buffer.writeln('  Valid: $isValid');
-    
+
     if (errors.isNotEmpty) {
       buffer.writeln('  Errors:');
       for (final error in errors) {
         buffer.writeln('    - $error');
       }
     }
-    
+
     if (warnings.isNotEmpty) {
       buffer.writeln('  Warnings:');
       for (final warning in warnings) {
         buffer.writeln('    - $warning');
       }
     }
-    
+
     return buffer.toString();
   }
 }
@@ -102,7 +102,8 @@ class DisplayConfigValidator extends ConfigValidator {
     // Validate orientation
     if (config.containsKey('orientation')) {
       final orientation = config['orientation'];
-      if (orientation is! String || !['portrait', 'landscape'].contains(orientation)) {
+      if (orientation is! String ||
+          !['portrait', 'landscape'].contains(orientation)) {
         errors.add('orientation must be either "portrait" or "landscape"');
       }
     }
@@ -113,7 +114,8 @@ class DisplayConfigValidator extends ConfigValidator {
       if (interval is! int || interval < 0) {
         errors.add('auto_refresh_interval must be a non-negative integer');
       } else if (interval > 0 && interval < 5) {
-        warnings.add('auto_refresh_interval less than 5 seconds may cause excessive API calls');
+        warnings.add(
+            'auto_refresh_interval less than 5 seconds may cause excessive API calls');
       }
     }
 
@@ -146,12 +148,13 @@ class DisplayConfigValidator extends ConfigValidator {
   Map<String, dynamic>? migrate(Map<String, dynamic> config, int fromVersion) {
     if (fromVersion < 2) {
       // Migration from version 1 to 2: rename 'auto_refresh' to 'auto_refresh_interval'
-      if (config.containsKey('auto_refresh') && !config.containsKey('auto_refresh_interval')) {
+      if (config.containsKey('auto_refresh') &&
+          !config.containsKey('auto_refresh_interval')) {
         config['auto_refresh_interval'] = config['auto_refresh'];
         config.remove('auto_refresh');
       }
     }
-    
+
     if (fromVersion < 3) {
       // Migration from version 2 to 3: add new metadata settings
       if (!config.containsKey('show_metadata_on_tap')) {
@@ -161,7 +164,7 @@ class DisplayConfigValidator extends ConfigValidator {
         config['metadata_auto_hide_delay'] = 3;
       }
     }
-    
+
     return config;
   }
 }
@@ -192,7 +195,8 @@ class ApiConfigValidator extends ConfigValidator {
       if (timeout is! int || timeout <= 0) {
         errors.add('timeout must be a positive integer');
       } else if (timeout > 60) {
-        warnings.add('timeout greater than 60 seconds may cause poor user experience');
+        warnings.add(
+            'timeout greater than 60 seconds may cause poor user experience');
       }
     }
 
@@ -202,7 +206,8 @@ class ApiConfigValidator extends ConfigValidator {
       if (retryAttempts is! int || retryAttempts < 0) {
         errors.add('retry_attempts must be a non-negative integer');
       } else if (retryAttempts > 10) {
-        warnings.add('retry_attempts greater than 10 may cause excessive delays');
+        warnings
+            .add('retry_attempts greater than 10 may cause excessive delays');
       }
     }
 
@@ -237,7 +242,7 @@ class ApiConfigValidator extends ConfigValidator {
         }
       }
     }
-    
+
     return config;
   }
 }
@@ -258,7 +263,13 @@ class FiltersConfigValidator extends ConfigValidator {
     }
 
     // Validate list fields
-    final listFields = ['sets', 'colors', 'card_types', 'creature_types', 'rarity'];
+    final listFields = [
+      'sets',
+      'colors',
+      'card_types',
+      'creature_types',
+      'rarity'
+    ];
     for (final field in listFields) {
       if (config.containsKey(field)) {
         final value = config[field];
@@ -281,8 +292,16 @@ class FiltersConfigValidator extends ConfigValidator {
         errors.add('format must be a string');
       } else {
         final validFormats = [
-          'standard', 'modern', 'legacy', 'vintage', 'commander',
-          'pioneer', 'historic', 'pauper', 'brawl', 'future'
+          'standard',
+          'modern',
+          'legacy',
+          'vintage',
+          'commander',
+          'pioneer',
+          'historic',
+          'pauper',
+          'brawl',
+          'future'
         ];
         if (!validFormats.contains(format)) {
           warnings.add('format "$format" is not a recognized format');
@@ -320,7 +339,7 @@ class FiltersConfigValidator extends ConfigValidator {
         config['creature_types'] = <String>[];
       }
     }
-    
+
     return config;
   }
 }
@@ -343,7 +362,8 @@ class ConfigurationValidator {
     // Check version and migrate if needed
     final version = config['version'] as int? ?? 1;
     if (version < _currentVersion) {
-      warnings.add('Configuration version $version is outdated, migrating to version $_currentVersion');
+      warnings.add(
+          'Configuration version $version is outdated, migrating to version $_currentVersion');
       migratedConfig = _migrateConfiguration(config, version);
     }
 
@@ -351,9 +371,10 @@ class ConfigurationValidator {
 
     // Validate each section
     for (final validator in _validators) {
-      final sectionConfig = configToValidate[validator.section] as Map<String, dynamic>? ?? {};
+      final sectionConfig =
+          configToValidate[validator.section] as Map<String, dynamic>? ?? {};
       final result = validator.validate(sectionConfig);
-      
+
       if (!result.isValid) {
         errors.addAll(result.errors.map((e) => '${validator.section}: $e'));
       }
@@ -361,7 +382,8 @@ class ConfigurationValidator {
     }
 
     return errors.isEmpty
-        ? ValidationResult.success(warnings: warnings, migratedConfig: migratedConfig)
+        ? ValidationResult.success(
+            warnings: warnings, migratedConfig: migratedConfig)
         : ValidationResult.failure(errors: errors, warnings: warnings);
   }
 
@@ -377,11 +399,13 @@ class ConfigurationValidator {
     return config;
   }
 
-  Map<String, dynamic> _migrateConfiguration(Map<String, dynamic> config, int fromVersion) {
+  Map<String, dynamic> _migrateConfiguration(
+      Map<String, dynamic> config, int fromVersion) {
     final migratedConfig = Map<String, dynamic>.from(config);
 
     for (final validator in _validators) {
-      final sectionConfig = migratedConfig[validator.section] as Map<String, dynamic>? ?? {};
+      final sectionConfig =
+          migratedConfig[validator.section] as Map<String, dynamic>? ?? {};
       final migrated = validator.migrate(sectionConfig, fromVersion);
       if (migrated != null) {
         migratedConfig[validator.section] = migrated;
@@ -392,9 +416,10 @@ class ConfigurationValidator {
     return migratedConfig;
   }
 
-  Result<Map<String, dynamic>> validateAndMergeWithDefaults(Map<String, dynamic> config) {
+  Result<Map<String, dynamic>> validateAndMergeWithDefaults(
+      Map<String, dynamic> config) {
     final result = validateConfiguration(config);
-    
+
     if (!result.isValid) {
       return Failure(ValidationError(
         message: 'Configuration validation failed',
@@ -407,21 +432,23 @@ class ConfigurationValidator {
     // Merge with defaults
     final defaults = getDefaultConfiguration();
     final merged = _deepMerge(defaults, result.migratedConfig ?? config);
-    
+
     return Success(merged);
   }
 
-  Map<String, dynamic> _deepMerge(Map<String, dynamic> defaults, Map<String, dynamic> config) {
+  Map<String, dynamic> _deepMerge(
+      Map<String, dynamic> defaults, Map<String, dynamic> config) {
     final result = Map<String, dynamic>.from(defaults);
-    
+
     config.forEach((key, value) {
-      if (value is Map<String, dynamic> && result[key] is Map<String, dynamic>) {
+      if (value is Map<String, dynamic> &&
+          result[key] is Map<String, dynamic>) {
         result[key] = _deepMerge(result[key] as Map<String, dynamic>, value);
       } else {
         result[key] = value;
       }
     });
-    
+
     return result;
   }
 }
@@ -429,12 +456,12 @@ class ConfigurationValidator {
 // Enhanced configuration service with validation
 class EnhancedConfigService {
   static EnhancedConfigService? _instance;
-  static EnhancedConfigService get instance => _instance ??= EnhancedConfigService._();
+  static EnhancedConfigService get instance =>
+      _instance ??= EnhancedConfigService._();
 
   EnhancedConfigService._();
 
   final ConfigurationValidator _validator = ConfigurationValidator();
-
 
   Result<Map<String, dynamic>> loadAndValidateConfiguration(String configJson) {
     try {
@@ -495,4 +522,4 @@ class EnhancedConfigService {
     final sets = config['filters']?['sets'] as List?;
     return sets?.cast<String>() ?? <String>[];
   }
-} 
+}

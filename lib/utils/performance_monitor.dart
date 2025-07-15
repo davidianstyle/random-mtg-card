@@ -27,15 +27,16 @@ class PerformanceMetrics {
   });
 
   Map<String, dynamic> toJson() => {
-    'cpu_usage_percent': cpuUsage,
-    'memory_usage_mb': memoryUsageMB,
-    'frame_rate': frameRate,
-    'total_frames': totalFrames,
-    'dropped_frames': droppedFrames,
-    'average_frame_time_ms': averageFrameTime.inMicroseconds / 1000,
-    'api_call_durations': apiCallDurations.map((k, v) => MapEntry(k, v.inMilliseconds)),
-    'api_call_counts': apiCallCounts,
-  };
+        'cpu_usage_percent': cpuUsage,
+        'memory_usage_mb': memoryUsageMB,
+        'frame_rate': frameRate,
+        'total_frames': totalFrames,
+        'dropped_frames': droppedFrames,
+        'average_frame_time_ms': averageFrameTime.inMicroseconds / 1000,
+        'api_call_durations':
+            apiCallDurations.map((k, v) => MapEntry(k, v.inMilliseconds)),
+        'api_call_counts': apiCallCounts,
+      };
 }
 
 // Performance event types
@@ -67,13 +68,13 @@ class PerformanceEvent {
   }) : duration = endTime.difference(startTime);
 
   Map<String, dynamic> toJson() => {
-    'name': name,
-    'type': type.name,
-    'start_time': startTime.toIso8601String(),
-    'end_time': endTime.toIso8601String(),
-    'duration_ms': duration.inMilliseconds,
-    'metadata': metadata,
-  };
+        'name': name,
+        'type': type.name,
+        'start_time': startTime.toIso8601String(),
+        'end_time': endTime.toIso8601String(),
+        'duration_ms': duration.inMilliseconds,
+        'metadata': metadata,
+      };
 }
 
 // Performance timer for measuring operations
@@ -114,25 +115,26 @@ class FrameTimingTracker {
     if (_lastFrameTime != null) {
       final frameTime = now.difference(_lastFrameTime!);
       _frameTimes.add(frameTime);
-      
+
       if (_frameTimes.length > _maxSamples) {
         _frameTimes.removeAt(0);
       }
-      
+
       // Consider frame dropped if it takes more than 20ms (50fps)
       if (frameTime.inMilliseconds > 20) {
         _droppedFrames++;
       }
     }
-    
+
     _lastFrameTime = now;
     _totalFrames++;
   }
 
   double get averageFrameRate {
     if (_frameTimes.isEmpty) return 0;
-    
-    final totalMicroseconds = _frameTimes.fold(0, (sum, duration) => sum + duration.inMicroseconds);
+
+    final totalMicroseconds =
+        _frameTimes.fold(0, (sum, duration) => sum + duration.inMicroseconds);
     final avgMicroseconds = totalMicroseconds / _frameTimes.length;
     return avgMicroseconds > 0 ? 1000000 / avgMicroseconds : 0;
   }
@@ -149,7 +151,7 @@ class FrameTimingTracker {
 // Memory usage tracker
 class MemoryTracker {
   static const MethodChannel _channel = MethodChannel('memory_info');
-  
+
   Future<int> getCurrentMemoryUsage() async {
     try {
       if (Platform.isAndroid || Platform.isIOS) {
@@ -174,7 +176,8 @@ class MemoryTracker {
 // Performance monitor
 class PerformanceMonitor {
   static PerformanceMonitor? _instance;
-  static PerformanceMonitor get instance => _instance ??= PerformanceMonitor._();
+  static PerformanceMonitor get instance =>
+      _instance ??= PerformanceMonitor._();
 
   PerformanceMonitor._();
 
@@ -183,7 +186,7 @@ class PerformanceMonitor {
   final List<PerformanceEvent> _events = [];
   final FrameTimingTracker _frameTracker = FrameTimingTracker();
   final MemoryTracker _memoryTracker = MemoryTracker();
-  
+
   Timer? _metricsTimer;
   bool _isEnabled = false;
   final int _maxEvents = 1000;
@@ -191,18 +194,18 @@ class PerformanceMonitor {
   // Enable/disable monitoring
   void enable() {
     if (_isEnabled) return;
-    
+
     _isEnabled = true;
-    
+
     // Start frame timing
     SchedulerBinding.instance.addPostFrameCallback(_onFrameEnd);
-    
+
     // Start periodic metrics collection
     _metricsTimer = Timer.periodic(
       const Duration(seconds: 30),
       (_) => _collectMetrics(),
     );
-    
+
     Logger.instance.info('Performance monitoring enabled');
   }
 
@@ -214,7 +217,8 @@ class PerformanceMonitor {
   }
 
   // Start timing an operation
-  PerformanceTimer startTimer(String name, PerformanceEventType type, {Map<String, dynamic>? metadata}) {
+  PerformanceTimer startTimer(String name, PerformanceEventType type,
+      {Map<String, dynamic>? metadata}) {
     return PerformanceTimer(
       name: name,
       type: type,
@@ -225,20 +229,20 @@ class PerformanceMonitor {
   // Record a completed event
   void recordEvent(PerformanceEvent event) {
     if (!_isEnabled) return;
-    
+
     _events.add(event);
-    
+
     // Track API calls separately
     if (event.type == PerformanceEventType.apiCall) {
       _apiCallDurations[event.name] = event.duration;
       _apiCallCounts[event.name] = (_apiCallCounts[event.name] ?? 0) + 1;
     }
-    
+
     // Limit event history
     if (_events.length > _maxEvents) {
       _events.removeAt(0);
     }
-    
+
     // Log slow operations
     if (event.duration.inMilliseconds > 1000) {
       Logger.instance.warning(
@@ -271,7 +275,7 @@ class PerformanceMonitor {
   // Get current performance metrics
   Future<PerformanceMetrics> getMetrics() async {
     final memoryUsage = await _memoryTracker.getCurrentMemoryUsage();
-    
+
     return PerformanceMetrics(
       cpuUsage: _estimateCpuUsage(),
       memoryUsageMB: memoryUsage,
@@ -295,27 +299,34 @@ class PerformanceMonitor {
   Map<String, dynamic> getSummary() {
     final now = DateTime.now();
     final last24h = now.subtract(const Duration(hours: 24));
-    
-    final recentEvents = _events.where((e) => e.startTime.isAfter(last24h)).toList();
-    
-    final apiEvents = recentEvents.where((e) => e.type == PerformanceEventType.apiCall);
-    final imageEvents = recentEvents.where((e) => e.type == PerformanceEventType.imageLoad);
-    final uiEvents = recentEvents.where((e) => e.type == PerformanceEventType.uiRender);
-    
+
+    final recentEvents =
+        _events.where((e) => e.startTime.isAfter(last24h)).toList();
+
+    final apiEvents =
+        recentEvents.where((e) => e.type == PerformanceEventType.apiCall);
+    final imageEvents =
+        recentEvents.where((e) => e.type == PerformanceEventType.imageLoad);
+    final uiEvents =
+        recentEvents.where((e) => e.type == PerformanceEventType.uiRender);
+
     return {
       'total_events_24h': recentEvents.length,
       'api_calls_24h': apiEvents.length,
       'image_loads_24h': imageEvents.length,
       'ui_renders_24h': uiEvents.length,
-      'average_api_time_ms': apiEvents.isNotEmpty 
-          ? apiEvents.map((e) => e.duration.inMilliseconds).reduce((a, b) => a + b) / apiEvents.length
+      'average_api_time_ms': apiEvents.isNotEmpty
+          ? apiEvents
+                  .map((e) => e.duration.inMilliseconds)
+                  .reduce((a, b) => a + b) /
+              apiEvents.length
           : 0,
       'slowest_operations': _getSlowestOperations(),
       'frame_stats': {
         'total_frames': _frameTracker.totalFrames,
         'dropped_frames': _frameTracker.droppedFrames,
-        'drop_rate': _frameTracker.totalFrames > 0 
-            ? _frameTracker.droppedFrames / _frameTracker.totalFrames 
+        'drop_rate': _frameTracker.totalFrames > 0
+            ? _frameTracker.droppedFrames / _frameTracker.totalFrames
             : 0,
       },
     };
@@ -324,9 +335,9 @@ class PerformanceMonitor {
   // Frame callback
   void _onFrameEnd(Duration timeStamp) {
     if (!_isEnabled) return;
-    
+
     _frameTracker.recordFrame();
-    
+
     // Schedule next frame callback
     SchedulerBinding.instance.addPostFrameCallback(_onFrameEnd);
   }
@@ -334,10 +345,10 @@ class PerformanceMonitor {
   // Collect metrics periodically
   Future<void> _collectMetrics() async {
     if (!_isEnabled) return;
-    
+
     try {
       final metrics = await getMetrics();
-      
+
       Logger.instance.info(
         'Performance metrics collected',
         component: 'PerformanceMonitor',
@@ -348,7 +359,7 @@ class PerformanceMonitor {
           'api_calls': metrics.apiCallCounts.values.fold(0, (a, b) => a + b),
         },
       );
-      
+
       // Alert on performance issues
       if (metrics.frameRate < 30) {
         Logger.instance.warning(
@@ -356,7 +367,7 @@ class PerformanceMonitor {
           component: 'PerformanceMonitor',
         );
       }
-      
+
       if (metrics.memoryUsageMB > 200) {
         Logger.instance.warning(
           'High memory usage: ${metrics.memoryUsageMB}MB',
@@ -371,10 +382,10 @@ class PerformanceMonitor {
   // Estimate CPU usage (simplified)
   double _estimateCpuUsage() {
     // This is a simplified estimation - in a real app you'd want more accurate tracking
-    final dropRate = _frameTracker.totalFrames > 0 
-        ? _frameTracker.droppedFrames / _frameTracker.totalFrames 
+    final dropRate = _frameTracker.totalFrames > 0
+        ? _frameTracker.droppedFrames / _frameTracker.totalFrames
         : 0;
-    
+
     return (dropRate * 100).clamp(0, 100).toDouble();
   }
 
@@ -382,13 +393,16 @@ class PerformanceMonitor {
   List<Map<String, dynamic>> _getSlowestOperations() {
     final events = _events.toList();
     events.sort((a, b) => b.duration.compareTo(a.duration));
-    
-    return events.take(10).map((e) => {
-      'name': e.name,
-      'type': e.type.name,
-      'duration_ms': e.duration.inMilliseconds,
-      'timestamp': e.startTime.toIso8601String(),
-    }).toList();
+
+    return events
+        .take(10)
+        .map((e) => {
+              'name': e.name,
+              'type': e.type.name,
+              'duration_ms': e.duration.inMilliseconds,
+              'timestamp': e.startTime.toIso8601String(),
+            })
+        .toList();
   }
 
   // Clear all collected data
@@ -407,21 +421,28 @@ class PerformanceMonitor {
 
 // Extensions for easy performance monitoring
 extension PerformanceExtensions<T> on Future<T> {
-  Future<T> timed(String name, PerformanceEventType type, {Map<String, dynamic>? metadata}) {
-    return PerformanceMonitor.instance.timeOperation(name, type, () => this, metadata: metadata);
+  Future<T> timed(String name, PerformanceEventType type,
+      {Map<String, dynamic>? metadata}) {
+    return PerformanceMonitor.instance
+        .timeOperation(name, type, () => this, metadata: metadata);
   }
 }
 
 // Mixin for automatic performance monitoring
 mixin PerformanceMonitoring {
   PerformanceMonitor get performanceMonitor => PerformanceMonitor.instance;
-  
-  Future<T> timeAsync<T>(String name, Future<T> Function() operation, {Map<String, dynamic>? metadata}) {
-    return performanceMonitor.timeOperation(name, PerformanceEventType.custom, operation, metadata: metadata);
+
+  Future<T> timeAsync<T>(String name, Future<T> Function() operation,
+      {Map<String, dynamic>? metadata}) {
+    return performanceMonitor.timeOperation(
+        name, PerformanceEventType.custom, operation,
+        metadata: metadata);
   }
-  
-  T timeSync<T>(String name, T Function() operation, {Map<String, dynamic>? metadata}) {
-    final timer = performanceMonitor.startTimer(name, PerformanceEventType.custom, metadata: metadata);
+
+  T timeSync<T>(String name, T Function() operation,
+      {Map<String, dynamic>? metadata}) {
+    final timer = performanceMonitor
+        .startTimer(name, PerformanceEventType.custom, metadata: metadata);
     try {
       final result = operation();
       performanceMonitor.recordEvent(timer.stop());
@@ -431,4 +452,4 @@ mixin PerformanceMonitoring {
       rethrow;
     }
   }
-} 
+}

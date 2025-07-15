@@ -23,7 +23,8 @@ class FilterOption {
 }
 
 // Enhanced Scryfall service with better error handling and caching
-class ScryfallService extends Service with PerformanceMonitoring, LoggerExtension {
+class ScryfallService extends Service
+    with PerformanceMonitoring, LoggerExtension {
   static ScryfallService? _instance;
   static ScryfallService get instance => _instance ??= ScryfallService._();
 
@@ -36,7 +37,7 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
   // Rate limiting
   static const Duration _rateLimitDelay = Duration(milliseconds: 100);
   DateTime _lastRequestTime = DateTime.now();
-  
+
   // Circuit breaker for API failures
   int _failureCount = 0;
   DateTime? _circuitBreakerOpenTime;
@@ -50,7 +51,7 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
     _config = getService<ConfigService>();
     _cache = getService<CacheService>();
     _httpClient = http.Client();
-    
+
     logInfo('Scryfall service initialized');
   }
 
@@ -63,7 +64,8 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
   // Circuit breaker check
   bool get _isCircuitBreakerOpen {
     if (_circuitBreakerOpenTime == null) return false;
-    if (DateTime.now().difference(_circuitBreakerOpenTime!) > _circuitBreakerTimeout) {
+    if (DateTime.now().difference(_circuitBreakerOpenTime!) >
+        _circuitBreakerTimeout) {
       _circuitBreakerOpenTime = null;
       _failureCount = 0;
       return false;
@@ -75,7 +77,8 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
     _failureCount++;
     if (_failureCount >= _maxFailures) {
       _circuitBreakerOpenTime = DateTime.now();
-      logWarning('Circuit breaker opened due to $_failureCount consecutive failures');
+      logWarning(
+          'Circuit breaker opened due to $_failureCount consecutive failures');
     }
   }
 
@@ -109,20 +112,22 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
           (response) async {
             final json = jsonDecode(response);
             final card = MTGCard.fromJson(json);
-            
+
             // Cache the response
-            await _cache.cacheApiResponse('random_card', response, 
+            await _cache.cacheApiResponse('random_card', response,
                 ttl: const Duration(minutes: 5));
-            
-            logInfo('Random card fetched successfully', context: {'card_id': card.id});
+
+            logInfo('Random card fetched successfully',
+                context: {'card_id': card.id});
             return Success(card);
           },
           (error) => Failure(error),
         );
       } catch (e, stackTrace) {
         logError('Failed to get random card', error: e, stackTrace: stackTrace);
-        return Failure(UnknownError(message: 'Failed to get random card', originalError: e));
-    }
+        return Failure(UnknownError(
+            message: 'Failed to get random card', originalError: e));
+      }
     });
   }
 
@@ -157,46 +162,50 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
         );
 
         final cacheKey = 'search_${searchQuery}_${page}_$pageSize';
-        
+
         // Check cache
         final cacheResult = await _cache.getApiResponse(cacheKey);
         if (cacheResult.isSuccess) {
           logDebug('Search results served from cache');
           final json = jsonDecode(cacheResult.dataOrNull!);
           final data = json['data'] as List;
-          return Success(data.map((cardJson) => MTGCard.fromJson(cardJson)).toList());
-      }
+          return Success(
+              data.map((cardJson) => MTGCard.fromJson(cardJson)).toList());
+        }
 
         // Make API request
-        final url = '/cards/search?q=${Uri.encodeComponent(searchQuery)}&page=$page';
+        final url =
+            '/cards/search?q=${Uri.encodeComponent(searchQuery)}&page=$page';
         final result = await _makeApiRequest(url);
-        
+
         return result.fold(
           (response) async {
             final json = jsonDecode(response);
             final data = json['data'] as List;
-            final cards = data.map((cardJson) => MTGCard.fromJson(cardJson)).toList();
-            
+            final cards =
+                data.map((cardJson) => MTGCard.fromJson(cardJson)).toList();
+
             // Cache the response
-            await _cache.cacheApiResponse(cacheKey, response, 
+            await _cache.cacheApiResponse(cacheKey, response,
                 ttl: const Duration(hours: 1));
-            
+
             logInfo('Search completed successfully', context: {
               'query': searchQuery,
               'results': cards.length,
               'page': page,
             });
-            
+
             return Success(cards);
           },
           (error) => Failure(error),
         );
       } catch (e, stackTrace) {
         logError('Failed to search cards', error: e, stackTrace: stackTrace);
-        return Failure(UnknownError(message: 'Failed to search cards', originalError: e));
+        return Failure(
+            UnknownError(message: 'Failed to search cards', originalError: e));
       }
     });
-      }
+  }
 
   // Get specific card by ID
   Future<Result<MTGCard>> getCardResult(String id) async {
@@ -210,7 +219,7 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
 
       try {
         final cacheKey = 'card_$id';
-        
+
         // Check cache
         final cacheResult = await _cache.getApiResponse(cacheKey);
         if (cacheResult.isSuccess) {
@@ -221,25 +230,26 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
 
         // Make API request
         final result = await _makeApiRequest('/cards/$id');
-        
+
         return result.fold(
           (response) async {
             final json = jsonDecode(response);
             final card = MTGCard.fromJson(json);
-            
+
             // Cache the response
-            await _cache.cacheApiResponse(cacheKey, response, 
+            await _cache.cacheApiResponse(cacheKey, response,
                 ttl: const Duration(days: 1));
-            
+
             logInfo('Card fetched successfully', context: {'card_id': id});
             return Success(card);
           },
           (error) => Failure(error),
         );
       } catch (e, stackTrace) {
-        logError('Failed to get card', error: e, stackTrace: stackTrace, 
-            context: {'card_id': id});
-        return Failure(UnknownError(message: 'Failed to get card', originalError: e));
+        logError('Failed to get card',
+            error: e, stackTrace: stackTrace, context: {'card_id': id});
+        return Failure(
+            UnknownError(message: 'Failed to get card', originalError: e));
       }
     });
   }
@@ -257,19 +267,19 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
 
         // Download image
         final response = await _httpClient.get(Uri.parse(imageUrl));
-      if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
           final imageData = response.bodyBytes;
-          
+
           // Cache the image
           await _cache.cacheImage(imageUrl, imageData);
-          
+
           logInfo('Image downloaded and cached', context: {
             'url': imageUrl,
             'size_kb': imageData.length / 1024,
           });
-          
+
           return Success(imageData);
-      } else {
+        } else {
           return Failure(NetworkError(
             message: 'Failed to download image',
             code: response.statusCode,
@@ -277,7 +287,8 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
         }
       } catch (e, stackTrace) {
         logError('Failed to get card image', error: e, stackTrace: stackTrace);
-        return Failure(UnknownError(message: 'Failed to get card image', originalError: e));
+        return Failure(UnknownError(
+            message: 'Failed to get card image', originalError: e));
       }
     });
   }
@@ -291,8 +302,9 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
           (_) => const Success(true),
           (error) => Failure(error),
         );
-    } catch (e) {
-        return Failure(UnknownError(message: 'Service check failed', originalError: e));
+      } catch (e) {
+        return Failure(
+            UnknownError(message: 'Service check failed', originalError: e));
       }
     });
   }
@@ -364,7 +376,8 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
       final searchResults = await searchCards(
         sets: _config.filterSets.isNotEmpty ? _config.filterSets : null,
         colors: _config.filterColors.isNotEmpty ? _config.filterColors : null,
-        types: _config.filterCardTypes.isNotEmpty ? _config.filterCardTypes : null,
+        types:
+            _config.filterCardTypes.isNotEmpty ? _config.filterCardTypes : null,
         rarity: _config.filterRarity.isNotEmpty ? _config.filterRarity : null,
         format: _config.filterFormat.isNotEmpty ? _config.filterFormat : null,
       );
@@ -623,7 +636,8 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
         await _waitForRateLimit();
 
         final url = '${_config.apiBaseUrl}$path';
-        logDebug('Making API request', context: {'url': url, 'attempt': attempts + 1});
+        logDebug('Making API request',
+            context: {'url': url, 'attempt': attempts + 1});
 
         final response = await _httpClient.get(
           Uri.parse(url),
@@ -648,12 +662,12 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
             statusCode: response.statusCode,
             originalError: response.body,
           );
-          
+
           logWarning('API request failed', context: {
             'status_code': response.statusCode,
             'response': response.body,
           });
-          
+
           _recordFailure();
           return Failure(error);
         }
@@ -662,10 +676,12 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
         _recordFailure();
         return const Failure(NetworkError(message: 'Request timed out'));
       } on SocketException catch (e) {
-        logWarning('Network error', error: e, context: {'attempt': attempts + 1});
+        logWarning('Network error',
+            error: e, context: {'attempt': attempts + 1});
         if (attempts == maxAttempts - 1) {
           _recordFailure();
-          return Failure(NetworkError(message: 'Network error', originalError: e));
+          return Failure(
+              NetworkError(message: 'Network error', originalError: e));
         }
       } on HttpException catch (e) {
         logWarning('HTTP error', error: e, context: {'attempt': attempts + 1});
@@ -676,7 +692,8 @@ class ScryfallService extends Service with PerformanceMonitoring, LoggerExtensio
       } catch (e) {
         logError('Unexpected error during API request', error: e);
         _recordFailure();
-        return Failure(UnknownError(message: 'Unexpected error', originalError: e));
+        return Failure(
+            UnknownError(message: 'Unexpected error', originalError: e));
       }
 
       attempts++;

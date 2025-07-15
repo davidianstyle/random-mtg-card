@@ -28,17 +28,18 @@ class CacheEntry<T> {
   Duration get age => DateTime.now().difference(timestamp);
 
   Map<String, dynamic> toJson() => {
-    'data': data,
-    'timestamp': timestamp.toIso8601String(),
-    'expiresAt': expiresAt?.toIso8601String(),
-    'metadata': metadata,
-  };
+        'data': data,
+        'timestamp': timestamp.toIso8601String(),
+        'expiresAt': expiresAt?.toIso8601String(),
+        'metadata': metadata,
+      };
 
   factory CacheEntry.fromJson(Map<String, dynamic> json) {
     return CacheEntry<T>(
       data: json['data'] as T,
       timestamp: DateTime.parse(json['timestamp']),
-      expiresAt: json['expiresAt'] != null ? DateTime.parse(json['expiresAt']) : null,
+      expiresAt:
+          json['expiresAt'] != null ? DateTime.parse(json['expiresAt']) : null,
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
     );
   }
@@ -159,7 +160,9 @@ class FileCache extends Cache<Uint8List> {
     required String cacheDir,
     required int maxSizeMB,
     required Duration defaultTtl,
-  }) : _cacheDir = cacheDir, _maxSizeMB = maxSizeMB, _defaultTtl = defaultTtl;
+  })  : _cacheDir = cacheDir,
+        _maxSizeMB = maxSizeMB,
+        _defaultTtl = defaultTtl;
 
   static Future<FileCache> create({
     String? cacheDir,
@@ -211,7 +214,7 @@ class FileCache extends Cache<Uint8List> {
       // Check metadata
       final metaContent = await metaFile.readAsString();
       final metadata = jsonDecode(metaContent) as Map<String, dynamic>;
-      final expiresAt = metadata['expiresAt'] != null 
+      final expiresAt = metadata['expiresAt'] != null
           ? DateTime.parse(metadata['expiresAt'])
           : null;
 
@@ -223,7 +226,8 @@ class FileCache extends Cache<Uint8List> {
       final data = await cacheFile.readAsBytes();
       return Success(data);
     } catch (e) {
-      return Failure(CacheError(message: 'Failed to read cache', originalError: e));
+      return Failure(
+          CacheError(message: 'Failed to read cache', originalError: e));
     }
   }
 
@@ -250,7 +254,8 @@ class FileCache extends Cache<Uint8List> {
 
       return const Success(null);
     } catch (e) {
-      return Failure(CacheError(message: 'Failed to write cache', originalError: e));
+      return Failure(
+          CacheError(message: 'Failed to write cache', originalError: e));
     }
   }
 
@@ -269,7 +274,8 @@ class FileCache extends Cache<Uint8List> {
 
       return const Success(null);
     } catch (e) {
-      return Failure(CacheError(message: 'Failed to delete cache', originalError: e));
+      return Failure(
+          CacheError(message: 'Failed to delete cache', originalError: e));
     }
   }
 
@@ -283,7 +289,8 @@ class FileCache extends Cache<Uint8List> {
       }
       return const Success(null);
     } catch (e) {
-      return Failure(CacheError(message: 'Failed to clear cache', originalError: e));
+      return Failure(
+          CacheError(message: 'Failed to clear cache', originalError: e));
     }
   }
 
@@ -308,7 +315,8 @@ class FileCache extends Cache<Uint8List> {
       }
       return Success(totalSize);
     } catch (e) {
-      return Failure(CacheError(message: 'Failed to get cache size', originalError: e));
+      return Failure(
+          CacheError(message: 'Failed to get cache size', originalError: e));
     }
   }
 
@@ -328,7 +336,7 @@ class FileCache extends Cache<Uint8List> {
     try {
       final cacheDir = Directory(_cacheDir);
       final files = <File>[];
-      
+
       await for (final entity in cacheDir.list()) {
         if (entity is File && entity.path.endsWith('.meta')) {
           files.add(entity);
@@ -336,7 +344,8 @@ class FileCache extends Cache<Uint8List> {
       }
 
       // Sort by modification time (oldest first)
-      files.sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
+      files
+          .sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
 
       // Remove oldest files until under limit
       for (final file in files) {
@@ -348,7 +357,7 @@ class FileCache extends Cache<Uint8List> {
 
         final baseName = path.basenameWithoutExtension(file.path);
         final cacheFile = File(path.join(_cacheDir, '$baseName.cache'));
-        
+
         if (await file.exists()) await file.delete();
         if (await cacheFile.exists()) await cacheFile.delete();
       }
@@ -368,14 +377,14 @@ class FileCache extends Cache<Uint8List> {
           try {
             final content = await entity.readAsString();
             final metadata = jsonDecode(content) as Map<String, dynamic>;
-            final expiresAt = metadata['expiresAt'] != null 
+            final expiresAt = metadata['expiresAt'] != null
                 ? DateTime.parse(metadata['expiresAt'])
                 : null;
 
             if (expiresAt?.isBefore(now) ?? false) {
               final baseName = path.basenameWithoutExtension(entity.path);
               final cacheFile = File(path.join(_cacheDir, '$baseName.cache'));
-              
+
               if (await entity.exists()) await entity.delete();
               if (await cacheFile.exists()) await cacheFile.delete();
             }
@@ -386,7 +395,8 @@ class FileCache extends Cache<Uint8List> {
         }
       }
     } catch (e) {
-      Logger.instance.error('Failed to cleanup expired cache entries', error: e);
+      Logger.instance
+          .error('Failed to cleanup expired cache entries', error: e);
     }
   }
 }
@@ -434,7 +444,8 @@ class CacheService {
     return _apiCache.get(url);
   }
 
-  Future<Result<void>> cacheApiResponse(String url, String response, {Duration? ttl}) async {
+  Future<Result<void>> cacheApiResponse(String url, String response,
+      {Duration? ttl}) async {
     return _apiCache.put(url, response, ttl: ttl);
   }
 
@@ -458,7 +469,8 @@ class CacheService {
     return const Failure(CacheError(message: 'Image not found in cache'));
   }
 
-  Future<Result<void>> cacheImage(String url, Uint8List data, {Duration? ttl}) async {
+  Future<Result<void>> cacheImage(String url, Uint8List data,
+      {Duration? ttl}) async {
     // Store in both memory and disk
     await _memoryImageCache.put(url, data, ttl: ttl);
     await _diskImageCache.put(url, data, ttl: ttl);
@@ -495,4 +507,4 @@ class CacheService {
     _cleanupTimer?.cancel();
     _cleanupTimer = null;
   }
-} 
+}

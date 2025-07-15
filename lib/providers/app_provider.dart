@@ -8,7 +8,8 @@ import '../services/service_locator.dart';
 import '../utils/logger.dart';
 import '../utils/performance_monitor.dart';
 
-class AppProvider extends ChangeNotifier with LoggerExtension, PerformanceMonitoring {
+class AppProvider extends ChangeNotifier
+    with LoggerExtension, PerformanceMonitoring {
   static const String _favoritesKey = 'favorites';
 
   List<String> _favoriteCardIds = [];
@@ -32,11 +33,12 @@ class AppProvider extends ChangeNotifier with LoggerExtension, PerformanceMonito
       try {
         // Get services from service locator
         _config = getService<ConfigService>();
-        
+
         logInfo('App provider initialized');
         await _loadFavorites();
       } catch (e, stackTrace) {
-        logError('Failed to initialize app provider', error: e, stackTrace: stackTrace);
+        logError('Failed to initialize app provider',
+            error: e, stackTrace: stackTrace);
         _setError('Failed to initialize app provider');
       }
     });
@@ -62,7 +64,7 @@ class AppProvider extends ChangeNotifier with LoggerExtension, PerformanceMonito
       _favoriteCards.add(card);
       await _saveFavorites();
       notifyListeners();
-      
+
       logInfo('Card added to favorites', context: {
         'card_id': card.id,
         'card_name': card.name,
@@ -72,13 +74,20 @@ class AppProvider extends ChangeNotifier with LoggerExtension, PerformanceMonito
   }
 
   Future<void> removeFavorite(String cardId) async {
-    final removedCard = _favoriteCards.firstWhere((card) => card.id == cardId, orElse: () => MTGCard(id: cardId, name: 'Unknown', typeLine: '', set: '', setName: '', rarity: ''));
-    
+    final removedCard = _favoriteCards.firstWhere((card) => card.id == cardId,
+        orElse: () => MTGCard(
+            id: cardId,
+            name: 'Unknown',
+            typeLine: '',
+            set: '',
+            setName: '',
+            rarity: ''));
+
     _favoriteCardIds.remove(cardId);
     _favoriteCards.removeWhere((card) => card.id == cardId);
     await _saveFavorites();
     notifyListeners();
-    
+
     logInfo('Card removed from favorites', context: {
       'card_id': cardId,
       'card_name': removedCard.name,
@@ -169,13 +178,15 @@ class AppProvider extends ChangeNotifier with LoggerExtension, PerformanceMonito
                 _favoriteCards.add(card);
               } catch (e) {
                 // If card data is corrupted, just keep the ID
-                logWarning('Error loading favorite card data', error: e, context: {
-                  'card_id': cardId,
-                });
+                logWarning('Error loading favorite card data',
+                    error: e,
+                    context: {
+                      'card_id': cardId,
+                    });
               }
             }
           }
-          
+
           logInfo('Favorites loaded successfully', context: {
             'favorites_count': _favoriteCardIds.length,
           });
@@ -212,7 +223,7 @@ class AppProvider extends ChangeNotifier with LoggerExtension, PerformanceMonito
 
         final favoritesJson = jsonEncode(favoritesList);
         await prefs.setString(_favoritesKey, favoritesJson);
-        
+
         logDebug('Favorites saved successfully', context: {
           'favorites_count': _favoriteCardIds.length,
         });

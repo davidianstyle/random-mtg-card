@@ -38,7 +38,7 @@ class ServiceLocator {
   // Get a service
   T get<T>() {
     final type = T;
-    
+
     // Check if already instantiated
     if (_services.containsKey(type)) {
       return _services[type] as T;
@@ -48,12 +48,12 @@ class ServiceLocator {
     if (_factories.containsKey(type)) {
       final factory = _factories[type] as ServiceFactory<T>;
       final instance = factory();
-      
+
       // Store if singleton
       if (_singletons[type] == true) {
         _services[type] = instance;
       }
-      
+
       return instance;
     }
 
@@ -83,9 +83,9 @@ class ServiceLocator {
 
   // Get all registered service types
   List<Type> get registeredTypes => [
-    ..._services.keys,
-    ..._factories.keys,
-  ];
+        ..._services.keys,
+        ..._factories.keys,
+      ];
 
   void _logRegistration<T>(String type) {
     Logger.instance.debug('Registered $type: ${T.toString()}');
@@ -99,7 +99,7 @@ class ServiceLocator {
 class ServiceNotRegisteredException implements Exception {
   final Type type;
   ServiceNotRegisteredException(this.type);
-  
+
   @override
   String toString() => 'Service not registered: $type';
 }
@@ -117,23 +117,23 @@ bool isServiceRegistered<T>() => ServiceLocator.instance.isRegistered<T>();
 class ServiceConfig {
   static Future<void> setupDependencies() async {
     final locator = ServiceLocator.instance;
-    
+
     // Register core services
     locator.registerSingleton<Logger>(Logger.instance);
-    
+
     // Register configuration service
     locator.registerSingleton<ConfigService>(ConfigService.instance);
-    
+
     Logger.instance.info('Dependencies configured');
   }
-  
+
   static Future<void> setupTestDependencies() async {
     final locator = ServiceLocator.instance;
     locator.reset();
-    
+
     // Register test/mock services
     locator.registerSingleton<Logger>(Logger.instance);
-    
+
     Logger.instance.info('Test dependencies configured');
   }
 }
@@ -141,9 +141,9 @@ class ServiceConfig {
 // Abstract base class for services
 abstract class Service {
   bool _disposed = false;
-  
+
   bool get disposed => _disposed;
-  
+
   @mustCallSuper
   void dispose() {
     _disposed = true;
@@ -153,11 +153,11 @@ abstract class Service {
 // Mixin for automatic service disposal
 mixin DisposableService {
   final List<Service> _services = [];
-  
+
   void registerService(Service service) {
     _services.add(service);
   }
-  
+
   void disposeServices() {
     for (final service in _services) {
       if (!service.disposed) {
@@ -166,4 +166,4 @@ mixin DisposableService {
     }
     _services.clear();
   }
-} 
+}

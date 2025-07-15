@@ -5,7 +5,8 @@ import '../models/mtg_card.dart';
 import '../utils/logger.dart';
 import '../utils/performance_monitor.dart';
 
-class CardWidget extends StatelessWidget with LoggerExtension, PerformanceMonitoring {
+class CardWidget extends StatelessWidget
+    with LoggerExtension, PerformanceMonitoring {
   final MTGCard? card;
 
   const CardWidget({
@@ -22,7 +23,8 @@ class CardWidget extends StatelessWidget with LoggerExtension, PerformanceMonito
     return Center(
       child: Semantics(
         label: 'Magic: The Gathering card: ${card!.name}',
-        hint: 'Card of type ${card!.typeLine}${card!.manaCost != null ? ' with mana cost ${card!.manaCost}' : ''}',
+        hint:
+            'Card of type ${card!.typeLine}${card!.manaCost != null ? ' with mana cost ${card!.manaCost}' : ''}',
         child: Container(
           width: 540,
           height: 756,

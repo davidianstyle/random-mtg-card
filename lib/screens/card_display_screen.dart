@@ -21,7 +21,8 @@ class CardDisplayScreen extends StatefulWidget {
   State<CardDisplayScreen> createState() => _CardDisplayScreenState();
 }
 
-class _CardDisplayScreenState extends State<CardDisplayScreen> with LoggerExtension, PerformanceMonitoring {
+class _CardDisplayScreenState extends State<CardDisplayScreen>
+    with LoggerExtension, PerformanceMonitoring {
   late final ConfigService _config;
   bool _showMenu = false;
 
@@ -32,7 +33,8 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> with LoggerExtens
       _config = getService<ConfigService>();
       _initializeProviders();
     } catch (e, stackTrace) {
-      logError('Failed to initialize card display screen', error: e, stackTrace: stackTrace);
+      logError('Failed to initialize card display screen',
+          error: e, stackTrace: stackTrace);
     }
   }
 
@@ -40,7 +42,7 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> with LoggerExtens
     return timeAsync('initializeProviders', () async {
       try {
         logInfo('Initializing card display screen providers');
-        
+
         final appProvider = Provider.of<AppProvider>(context, listen: false);
         final cardProvider = Provider.of<CardProvider>(context, listen: false);
 
@@ -54,10 +56,11 @@ class _CardDisplayScreenState extends State<CardDisplayScreen> with LoggerExtens
             'interval_seconds': _config.autoRefreshInterval,
           });
         }
-        
+
         logInfo('Card display screen providers initialized successfully');
       } catch (e, stackTrace) {
-        logError('Failed to initialize providers', error: e, stackTrace: stackTrace);
+        logError('Failed to initialize providers',
+            error: e, stackTrace: stackTrace);
       }
     });
   }

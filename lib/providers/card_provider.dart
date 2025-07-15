@@ -7,8 +7,8 @@ import '../services/service_locator.dart';
 import '../utils/logger.dart';
 import '../utils/performance_monitor.dart';
 
-
-class CardProvider extends ChangeNotifier with LoggerExtension, PerformanceMonitoring {
+class CardProvider extends ChangeNotifier
+    with LoggerExtension, PerformanceMonitoring {
   late final ScryfallService _scryfallService;
   late final ConfigService _config;
 
@@ -38,11 +38,12 @@ class CardProvider extends ChangeNotifier with LoggerExtension, PerformanceMonit
       // Get services from service locator
       _scryfallService = getService<ScryfallService>();
       _config = getService<ConfigService>();
-      
+
       logInfo('Card provider initialized');
       await loadRandomCard();
     } catch (e, stackTrace) {
-      logError('Failed to initialize card provider', error: e, stackTrace: stackTrace);
+      logError('Failed to initialize card provider',
+          error: e, stackTrace: stackTrace);
       _setError('Failed to initialize card provider');
     }
   }
@@ -56,7 +57,7 @@ class CardProvider extends ChangeNotifier with LoggerExtension, PerformanceMonit
       try {
         logDebug('Loading random card');
         final card = await _scryfallService.getRandomCardWithFilters();
-        
+
         if (card != null) {
           _setCurrentCard(card);
           logInfo('Random card loaded successfully', context: {
@@ -111,7 +112,7 @@ class CardProvider extends ChangeNotifier with LoggerExtension, PerformanceMonit
       try {
         logDebug('Loading specific card', context: {'card_id': cardId});
         final card = await _scryfallService.getCard(cardId);
-        
+
         if (card != null) {
           _setCurrentCard(card);
           logInfo('Card loaded successfully', context: {
