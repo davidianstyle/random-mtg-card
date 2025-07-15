@@ -1,4 +1,5 @@
 {
+  "version": 3,
   "display": {
     "fullscreen": true,
     "resolution": [600, 1024],
@@ -11,7 +12,8 @@
     "enabled": false,
     "sets": [],
     "colors": [],
-    "types": [],
+    "card_types": [],
+    "creature_types": [],
     "rarity": [],
     "format": "standard"
   },
@@ -29,5 +31,11 @@
     "timeout": 10,
     "retry_attempts": 3,
     "cache_images": true
+  },
+  "performance": {
+    "enable_monitoring": true,
+    "cache_size_mb": 500,
+    "max_memory_cache_entries": 100,
+    "log_level": "info"
   }
 } 

@@ -4,8 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/mtg_card.dart';
 import '../services/config_service.dart';
+import '../services/service_locator.dart';
+import '../utils/logger.dart';
+import '../utils/performance_monitor.dart';
 
-class AppProvider extends ChangeNotifier {
+class AppProvider extends ChangeNotifier
+    with LoggerExtension, PerformanceMonitoring {
   static const String _favoritesKey = 'favorites';
 
   List<String> _favoriteCardIds = [];
@@ -14,7 +18,7 @@ class AppProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
-  final ConfigService _config = ConfigService.instance;
+  late final ConfigService _config;
 
   // Getters
   List<String> get favoriteCardIds => _favoriteCardIds;
@@ -25,7 +29,19 @@ class AppProvider extends ChangeNotifier {
 
   // Initialize the provider
   Future<void> initialize() async {
-    await _loadFavorites();
+    return timeAsync('initializeAppProvider', () async {
+      try {
+        // Get services from service locator
+        _config = getService<ConfigService>();
+
+        logInfo('App provider initialized');
+        await _loadFavorites();
+      } catch (e, stackTrace) {
+        logError('Failed to initialize app provider',
+            error: e, stackTrace: stackTrace);
+        _setError('Failed to initialize app provider');
+      }
+    });
   }
 
   // Favorites management
@@ -48,14 +64,35 @@ class AppProvider extends ChangeNotifier {
       _favoriteCards.add(card);
       await _saveFavorites();
       notifyListeners();
+
+      logInfo('Card added to favorites', context: {
+        'card_id': card.id,
+        'card_name': card.name,
+        'total_favorites': _favoriteCardIds.length,
+      });
     }
   }
 
   Future<void> removeFavorite(String cardId) async {
+    final removedCard = _favoriteCards.firstWhere((card) => card.id == cardId,
+        orElse: () => MTGCard(
+            id: cardId,
+            name: 'Unknown',
+            typeLine: '',
+            set: '',
+            setName: '',
+            rarity: ''));
+
     _favoriteCardIds.remove(cardId);
     _favoriteCards.removeWhere((card) => card.id == cardId);
     await _saveFavorites();
     notifyListeners();
+
+    logInfo('Card removed from favorites', context: {
+      'card_id': cardId,
+      'card_name': removedCard.name,
+      'total_favorites': _favoriteCardIds.length,
+    });
   }
 
   Future<void> clearFavorites() async {
@@ -90,12 +127,23 @@ class AppProvider extends ChangeNotifier {
   // Error handling
   void setError(String? error) {
     _errorMessage = error;
+    if (error != null) {
+      logError('App provider error set', context: {'error': error});
+    }
     notifyListeners();
   }
 
   void clearError() {
+    if (_errorMessage != null) {
+      logDebug('App provider error cleared');
+    }
     _errorMessage = null;
     notifyListeners();
+  }
+
+  // Private helper for setting errors
+  void _setError(String error) {
+    setError(error);
   }
 
   // Auto-hide metadata after delay
@@ -109,62 +157,80 @@ class AppProvider extends ChangeNotifier {
 
   // Private methods
   Future<void> _loadFavorites() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final favoritesJson = prefs.getString(_favoritesKey);
+    return timeAsync('loadFavorites', () async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final favoritesJson = prefs.getString(_favoritesKey);
 
-      if (favoritesJson != null) {
-        final favoritesList = jsonDecode(favoritesJson) as List<dynamic>;
+        if (favoritesJson != null) {
+          final favoritesList = jsonDecode(favoritesJson) as List<dynamic>;
 
-        for (final favoriteJson in favoritesList) {
-          final favoriteData = favoriteJson as Map<String, dynamic>;
-          final cardId = favoriteData['id'] as String;
+          for (final favoriteJson in favoritesList) {
+            final favoriteData = favoriteJson as Map<String, dynamic>;
+            final cardId = favoriteData['id'] as String;
 
-          _favoriteCardIds.add(cardId);
+            _favoriteCardIds.add(cardId);
 
-          // Try to restore full card data if available
-          if (favoriteData['cardData'] != null) {
-            try {
-              final card = MTGCard.fromJson(favoriteData['cardData']);
-              _favoriteCards.add(card);
-            } catch (e) {
-              // If card data is corrupted, just keep the ID
-              debugPrint('Error loading favorite card data: $e');
+            // Try to restore full card data if available
+            if (favoriteData['cardData'] != null) {
+              try {
+                final card = MTGCard.fromJson(favoriteData['cardData']);
+                _favoriteCards.add(card);
+              } catch (e) {
+                // If card data is corrupted, just keep the ID
+                logWarning('Error loading favorite card data',
+                    error: e,
+                    context: {
+                      'card_id': cardId,
+                    });
+              }
             }
           }
+
+          logInfo('Favorites loaded successfully', context: {
+            'favorites_count': _favoriteCardIds.length,
+          });
+        } else {
+          logDebug('No favorites found');
         }
+      } catch (e, stackTrace) {
+        logError('Error loading favorites', error: e, stackTrace: stackTrace);
       }
-    } catch (e) {
-      debugPrint('Error loading favorites: $e');
-    }
+    });
   }
 
   Future<void> _saveFavorites() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
+    return timeAsync('saveFavorites', () async {
+      try {
+        final prefs = await SharedPreferences.getInstance();
 
-      final favoritesList = <Map<String, dynamic>>[];
+        final favoritesList = <Map<String, dynamic>>[];
 
-      for (int i = 0; i < _favoriteCardIds.length; i++) {
-        final cardId = _favoriteCardIds[i];
-        final favoriteData = <String, dynamic>{
-          'id': cardId,
-          'added_date': DateTime.now().toIso8601String(),
-        };
+        for (int i = 0; i < _favoriteCardIds.length; i++) {
+          final cardId = _favoriteCardIds[i];
+          final favoriteData = <String, dynamic>{
+            'id': cardId,
+            'added_date': DateTime.now().toIso8601String(),
+          };
 
-        // Include full card data if available
-        if (i < _favoriteCards.length) {
-          favoriteData['cardData'] = _favoriteCards[i].toJson();
+          // Include full card data if available
+          if (i < _favoriteCards.length) {
+            favoriteData['cardData'] = _favoriteCards[i].toJson();
+          }
+
+          favoritesList.add(favoriteData);
         }
 
-        favoritesList.add(favoriteData);
-      }
+        final favoritesJson = jsonEncode(favoritesList);
+        await prefs.setString(_favoritesKey, favoritesJson);
 
-      final favoritesJson = jsonEncode(favoritesList);
-      await prefs.setString(_favoritesKey, favoritesJson);
-    } catch (e) {
-      debugPrint('Error saving favorites: $e');
-    }
+        logDebug('Favorites saved successfully', context: {
+          'favorites_count': _favoriteCardIds.length,
+        });
+      } catch (e, stackTrace) {
+        logError('Error saving favorites', error: e, stackTrace: stackTrace);
+      }
+    });
   }
 
   // Export favorites (for backup/sharing)

@@ -3,19 +3,41 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:random_mtg_card/models/mtg_card.dart';
 import 'package:random_mtg_card/providers/card_provider.dart';
 import 'package:random_mtg_card/services/config_service.dart';
+import 'package:random_mtg_card/services/service_locator.dart';
+import 'package:random_mtg_card/utils/logger.dart';
 
 void main() {
   group('CardProvider', () {
     late CardProvider provider;
 
+    setUpAll(() async {
+      // Initialize Flutter binding for tests
+      TestWidgetsFlutterBinding.ensureInitialized();
+    });
+
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       await ConfigService.initialize();
+
+      // Initialize logger without file logging for tests
+      await Logger.initialize(
+        enableFileLogging: false,
+        enableConsoleLogging: true,
+        minLevel: LogLevel.error, // Reduce noise in tests
+      );
+
+      // Set up service locator with required services
+      final serviceLocator = ServiceLocator.instance;
+      serviceLocator.reset();
+      serviceLocator.registerSingleton<ConfigService>(ConfigService.instance);
+      serviceLocator.registerSingleton<Logger>(Logger.instance);
+
       provider = CardProvider();
     });
 
     tearDown(() async {
       SharedPreferences.setMockInitialValues({});
+      ServiceLocator.instance.reset();
     });
 
     group('Initialization', () {

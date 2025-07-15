@@ -1,7 +1,22 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:random_mtg_card/services/config_service.dart';
+
+// Helper function to suppress debug output during tests
+Future<void> runWithoutDebugOutput(Future<void> Function() callback) async {
+  final originalPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    // Suppress debug output during tests
+  };
+
+  try {
+    await callback();
+  } finally {
+    debugPrint = originalPrint;
+  }
+}
 
 void main() {
   group('ConfigService', () {
@@ -138,10 +153,12 @@ void main() {
           'app_config': 'invalid json',
         });
 
-        // Act & Assert
-        expect(() async => await ConfigService.initialize(), returnsNormally);
+        // Act & Assert - suppress debug print output during test
+        await runWithoutDebugOutput(() async {
+          expect(() async => await ConfigService.initialize(), returnsNormally);
+          await ConfigService.initialize();
+        });
 
-        await ConfigService.initialize();
         final config = ConfigService.instance.config;
 
         // Should fall back to defaults
@@ -383,10 +400,12 @@ void main() {
           'app_config': '{"invalid": json}',
         });
 
-        // Act & Assert
-        expect(() async => await ConfigService.initialize(), returnsNormally);
+        // Act & Assert - suppress debug print output during test
+        await runWithoutDebugOutput(() async {
+          expect(() async => await ConfigService.initialize(), returnsNormally);
+          await ConfigService.initialize();
+        });
 
-        await ConfigService.initialize();
         final config = ConfigService.instance.config;
 
         // Should fall back to defaults

@@ -1,6 +1,14 @@
 # Random MTG Card Display
 
-A cross-platform Flutter application for displaying random Magic: The Gathering cards from Scryfall API. Originally designed for Raspberry Pi with touchscreen but now supports Windows, MacOS, and Linux desktop environments.
+> 📚 **Technical Documentation**: For comprehensive technical documentation, architecture details, and development guides, see the **[memory-bank/](./memory-bank/)** directory.
+
+A Flutter application that displays random Magic: The Gathering cards with filtering, favorites, and cross-platform support.
+
+## 🚀 Quick Links
+
+- **[📖 Full Documentation](./memory-bank/README.md)** - Complete documentation index
+- **[🏗️ Architecture Guide](./memory-bank/MEMORY_BANK.md)** - Technical implementation details
+- **[🔧 Technical Specs](./memory-bank/TECHNICAL_SPECS.md)** - System requirements and specifications
 
 ## Features
 
