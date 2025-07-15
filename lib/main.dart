@@ -14,7 +14,6 @@ import 'services/cache_service.dart';
 import 'services/scryfall_service.dart';
 import 'utils/logger.dart';
 import 'utils/performance_monitor.dart';
-import 'utils/config_validator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
