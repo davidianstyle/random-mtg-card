@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2025-07-15)
+
+**Full Changelog**: https://github.com/davidianstyle/random-mtg-card/compare/random-mtg-card-v1.1.0...random-mtg-card-v1.1.1
+
 ## 1.1.0 (2025-07-15)
 
 **Full Changelog**: https://github.com/davidianstyle/random-mtg-card/compare/random-mtg-card-v1.0.9...random-mtg-card-v1.1.0
