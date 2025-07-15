@@ -10,7 +10,7 @@ Future<void> runWithoutDebugOutput(Future<void> Function() callback) async {
   debugPrint = (String? message, {int? wrapWidth}) {
     // Suppress debug output during tests
   };
-  
+
   try {
     await callback();
   } finally {

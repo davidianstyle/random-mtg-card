@@ -207,7 +207,7 @@ void main() {
         // Test getting all available sets
         final result = await service.getSets();
         expect(result, isA<List<Map<String, dynamic>>>());
-        
+
         // The method should return an empty list if API call fails
         // This handles network errors gracefully (returns [] on error)
         expect(result, isNotNull);
@@ -275,7 +275,7 @@ void main() {
         // Should have taken at least some time for two requests
         // This is a basic timing test - in a real implementation we'd mock the HTTP client
         expect(elapsed.inMilliseconds, greaterThanOrEqualTo(0));
-        
+
         // Just verify the service is working and returns expected types
         expect(service.getSets(), isA<Future<List<Map<String, dynamic>>>>());
       });
