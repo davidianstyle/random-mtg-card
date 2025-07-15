@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.2 (2025-07-15)
+
+## What's Changed
+* fix: Tech only enhancements by @davidianstyle in https://github.com/davidianstyle/random-mtg-card/pull/13
+
+## New Contributors
+* @davidianstyle made their first contribution in https://github.com/davidianstyle/random-mtg-card/pull/13
+
+**Full Changelog**: https://github.com/davidianstyle/random-mtg-card/compare/random-mtg-card-v1.1.1...random-mtg-card-v1.1.2
+
 ## 1.1.1 (2025-07-15)
 
 **Full Changelog**: https://github.com/davidianstyle/random-mtg-card/compare/random-mtg-card-v1.1.0...random-mtg-card-v1.1.1
