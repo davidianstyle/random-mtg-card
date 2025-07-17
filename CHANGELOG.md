@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 (2025-07-17)
+
+## What's Changed
+* fix: Window ratio by @davidianstyle in https://github.com/davidianstyle/random-mtg-card/pull/15
+* feat: Show selected filter options by @davidianstyle in https://github.com/davidianstyle/random-mtg-card/pull/16
+
+
+**Full Changelog**: https://github.com/davidianstyle/random-mtg-card/compare/random-mtg-card-v1.1.2...random-mtg-card-v1.2.0
+
 ## 1.1.2 (2025-07-15)
 
 ## What's Changed
