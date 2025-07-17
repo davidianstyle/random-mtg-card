@@ -66,6 +66,12 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
     widget.onChanged(newValues);
   }
 
+  void _removeOption(String value) {
+    final newValues = List<String>.from(widget.selectedValues);
+    newValues.remove(value);
+    widget.onChanged(newValues);
+  }
+
   void _clearAll() {
     widget.onChanged([]);
   }
@@ -122,9 +128,45 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
             ),
           ),
 
+          // Selected items chips (shown when collapsed)
+          if (!_isExpanded && widget.selectedValues.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+              child: SelectedItemsChips(
+                selectedValues: widget.selectedValues,
+                options: widget.options,
+                onRemove: _removeOption,
+              ),
+            ),
+
           // Expandable content
           if (_isExpanded) ...[
             const Divider(color: Colors.white24),
+
+            // Selected items chips (shown when expanded)
+            if (widget.selectedValues.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Selected:',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SelectedItemsChips(
+                      selectedValues: widget.selectedValues,
+                      options: widget.options,
+                      onRemove: _removeOption,
+                    ),
+                  ],
+                ),
+              ),
 
             // Search field
             Padding(
