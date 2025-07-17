@@ -134,8 +134,9 @@ Future<void> _configureWindow() async {
   final config = ConfigService.instance.config;
   final displayConfig = config['display'] as Map<String, dynamic>;
 
-  // Default window size (can be overridden by config)
-  Size windowSize = const Size(600, 1024);
+  // Default window size optimized for MTG card aspect ratio (can be overridden by config)
+  // MTG cards are ~2.5" x 3.5" (ratio ~0.714:1), adjusted for UI elements
+  Size windowSize = const Size(700, 900);
 
   // Platform-specific window configuration
   if (Platform.isLinux) {
@@ -165,8 +166,9 @@ Future<void> _configureWindow() async {
       backgroundColor: Colors.black,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
-      minimumSize: const Size(400, 600),
-      maximumSize: const Size(800, 1200),
+      minimumSize: const Size(500, 650), // Maintains card-friendly aspect ratio
+      maximumSize:
+          const Size(900, 1100), // Allows larger size while keeping proportions
       title: 'MTG Card Display',
     );
 
