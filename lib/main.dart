@@ -166,8 +166,9 @@ Future<void> _configureWindow() async {
       backgroundColor: Colors.black,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
-      minimumSize: const Size(500, 650),  // Maintains card-friendly aspect ratio
-      maximumSize: const Size(900, 1100), // Allows larger size while keeping proportions
+      minimumSize: const Size(500, 650), // Maintains card-friendly aspect ratio
+      maximumSize:
+          const Size(900, 1100), // Allows larger size while keeping proportions
       title: 'MTG Card Display',
     );
 
