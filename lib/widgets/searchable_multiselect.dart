@@ -28,6 +28,18 @@ class SearchableMultiSelect extends StatefulWidget {
 }
 
 class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
+  // Color constants for better maintainability
+  static const Color _cardBackgroundColor =
+      Color(0xFF212121); // Colors.grey[900]
+  static const Color _primaryTextColor = Colors.white;
+  static const Color _secondaryTextColor = Color(0xFFB3B3B3); // Colors.white70
+  static const Color _tertiaryTextColor = Color(0xFF8A8A8A); // Colors.white54
+  static const Color _dividerColor = Color(0xFF3D3D3D); // Colors.white24
+  static const Color _borderColor = Color(0xFF3D3D3D); // Colors.white24
+  static const Color _primaryAccentColor = Colors.blue;
+  static const Color _errorColor = Colors.red;
+  static const Color _chipBackgroundColor = Colors.blue;
+
   final TextEditingController _searchController = TextEditingController();
   List<FilterOption> _filteredOptions = [];
   bool _isExpanded = false;
@@ -56,20 +68,26 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
     });
   }
 
-  void _toggleOption(String value) {
+  // Utility function to update the selected values list
+  List<String> _updateValues(String value, bool add) {
     final newValues = List<String>.from(widget.selectedValues);
-    if (newValues.contains(value)) {
-      newValues.remove(value);
+    if (add) {
+      if (!newValues.contains(value)) {
+        newValues.add(value);
+      }
     } else {
-      newValues.add(value);
+      newValues.remove(value);
     }
-    widget.onChanged(newValues);
+    return newValues;
+  }
+
+  void _toggleOption(String value) {
+    final isCurrentlySelected = widget.selectedValues.contains(value);
+    widget.onChanged(_updateValues(value, !isCurrentlySelected));
   }
 
   void _removeOption(String value) {
-    final newValues = List<String>.from(widget.selectedValues);
-    newValues.remove(value);
-    widget.onChanged(newValues);
+    widget.onChanged(_updateValues(value, false));
   }
 
   void _clearAll() {
@@ -80,10 +98,48 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
     widget.onChanged(_filteredOptions.map((option) => option.value).toList());
   }
 
+  // Extract selected item chips display to reduce duplication
+  Widget _buildSelectedItemChips() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+      child: SelectedItemsChips(
+        selectedValues: widget.selectedValues,
+        options: widget.options,
+        onRemove: _removeOption,
+      ),
+    );
+  }
+
+  // Extract expanded selected item chips display
+  Widget _buildExpandedSelectedItemChips() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Selected:',
+            style: TextStyle(
+              color: _secondaryTextColor,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SelectedItemsChips(
+            selectedValues: widget.selectedValues,
+            options: widget.options,
+            onRemove: _removeOption,
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.grey[900],
+      color: _cardBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,7 +149,7 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
             title: Text(
               widget.title,
               style: const TextStyle(
-                color: Colors.white,
+                color: _primaryTextColor,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -101,7 +157,7 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
             subtitle: widget.selectedValues.isNotEmpty
                 ? Text(
                     '${widget.selectedValues.length} selected',
-                    style: const TextStyle(color: Colors.white70),
+                    style: const TextStyle(color: _secondaryTextColor),
                   )
                 : null,
             trailing: Row(
@@ -109,14 +165,15 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
               children: [
                 if (widget.selectedValues.isNotEmpty)
                   IconButton(
-                    icon: const Icon(Icons.clear_all, color: Colors.white70),
+                    icon:
+                        const Icon(Icons.clear_all, color: _secondaryTextColor),
                     onPressed: _clearAll,
                     tooltip: 'Clear all',
                   ),
                 IconButton(
                   icon: Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Colors.white70,
+                    color: _secondaryTextColor,
                   ),
                   onPressed: () {
                     setState(() {
@@ -130,58 +187,32 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
 
           // Selected items chips (shown when collapsed)
           if (!_isExpanded && widget.selectedValues.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-              child: SelectedItemsChips(
-                selectedValues: widget.selectedValues,
-                options: widget.options,
-                onRemove: _removeOption,
-              ),
-            ),
+            _buildSelectedItemChips(),
 
           // Expandable content
           if (_isExpanded) ...[
-            const Divider(color: Colors.white24),
+            const Divider(color: _dividerColor),
 
             // Selected items chips (shown when expanded)
             if (widget.selectedValues.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Selected:',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SelectedItemsChips(
-                      selectedValues: widget.selectedValues,
-                      options: widget.options,
-                      onRemove: _removeOption,
-                    ),
-                  ],
-                ),
-              ),
+              _buildExpandedSelectedItemChips(),
 
             // Search field
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: _searchController,
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: _primaryTextColor),
                 decoration: InputDecoration(
                   hintText: widget.placeholder ??
                       'Search ${widget.title.toLowerCase()}...',
-                  hintStyle: const TextStyle(color: Colors.white54),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                  hintStyle: const TextStyle(color: _tertiaryTextColor),
+                  prefixIcon:
+                      const Icon(Icons.search, color: _secondaryTextColor),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.white70),
+                          icon: const Icon(Icons.clear,
+                              color: _secondaryTextColor),
                           onPressed: () {
                             _searchController.clear();
                           },
@@ -189,15 +220,15 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                       : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.white24),
+                    borderSide: const BorderSide(color: _borderColor),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.white24),
+                    borderSide: const BorderSide(color: _borderColor),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.blue),
+                    borderSide: const BorderSide(color: _primaryAccentColor),
                   ),
                 ),
               ),
@@ -212,13 +243,13 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                     TextButton(
                       onPressed: _selectAll,
                       child: const Text('Select All',
-                          style: TextStyle(color: Colors.blue)),
+                          style: TextStyle(color: _primaryAccentColor)),
                     ),
                     const SizedBox(width: 16),
                     TextButton(
                       onPressed: _clearAll,
                       child: const Text('Clear All',
-                          style: TextStyle(color: Colors.red)),
+                          style: TextStyle(color: _errorColor)),
                     ),
                   ],
                 ),
@@ -229,7 +260,7 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
               const Padding(
                 padding: EdgeInsets.all(32.0),
                 child: Center(
-                  child: CircularProgressIndicator(color: Colors.blue),
+                  child: CircularProgressIndicator(color: _primaryAccentColor),
                 ),
               )
             else if (_filteredOptions.isEmpty)
@@ -238,7 +269,7 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                 child: Center(
                   child: Text(
                     'No options found',
-                    style: TextStyle(color: Colors.white54),
+                    style: TextStyle(color: _tertiaryTextColor),
                   ),
                 ),
               )
@@ -260,7 +291,9 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                       title: Text(
                         option.label,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.white70,
+                          color: isSelected
+                              ? _primaryTextColor
+                              : _secondaryTextColor,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
@@ -269,11 +302,11 @@ class _SearchableMultiSelectState extends State<SearchableMultiSelect> {
                           ? Text(
                               option.description!,
                               style: const TextStyle(
-                                  color: Colors.white54, fontSize: 12),
+                                  color: _tertiaryTextColor, fontSize: 12),
                             )
                           : null,
-                      activeColor: Colors.blue,
-                      checkColor: Colors.white,
+                      activeColor: _primaryAccentColor,
+                      checkColor: _primaryTextColor,
                       dense: true,
                     );
                   },
@@ -306,7 +339,8 @@ class SelectedItemsChips extends StatelessWidget {
     if (selectedValues.isEmpty) {
       return Text(
         emptyText ?? 'No items selected',
-        style: const TextStyle(color: Colors.white54),
+        style: const TextStyle(
+            color: _SearchableMultiSelectState._tertiaryTextColor),
       );
     }
 
@@ -322,10 +356,13 @@ class SelectedItemsChips extends StatelessWidget {
         return Chip(
           label: Text(
             option.label,
-            style: const TextStyle(color: Colors.white, fontSize: 12),
+            style: const TextStyle(
+                color: _SearchableMultiSelectState._primaryTextColor,
+                fontSize: 12),
           ),
-          backgroundColor: Colors.blue,
-          deleteIcon: const Icon(Icons.close, color: Colors.white, size: 16),
+          backgroundColor: _SearchableMultiSelectState._chipBackgroundColor,
+          deleteIcon: const Icon(Icons.close,
+              color: _SearchableMultiSelectState._primaryTextColor, size: 16),
           onDeleted: () => onRemove(value),
         );
       }).toList(),
