@@ -348,7 +348,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
               isLoading: _isLoadingCardTypes,
-              leading: const Icon(Icons.category, color: Colors.purple),
+              leading: const Icon(Icons.category, color: Colors.blue),
               placeholder: 'Search card types...',
               maxHeight: 200,
             ),
@@ -403,7 +403,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 });
               },
               isLoading: _isLoadingFormats,
-              leading: const Icon(Icons.gavel, color: Colors.orange),
+              leading: const Icon(Icons.gavel, color: Colors.red),
               placeholder: 'Search formats...',
               maxHeight: 250,
             ),
