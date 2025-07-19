@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import '../utils/logger.dart';
 import '../utils/result.dart';
+
+// Conditional imports for different platforms
+import 'dart:io' if (dart.library.js) 'cache_service_web.dart';
+import 'package:path_provider/path_provider.dart' if (dart.library.js) 'cache_service_web.dart';
 
 // Cache entry with metadata
 class CacheEntry<T> {
@@ -173,11 +174,19 @@ class FileCache extends Cache<Uint8List> {
     if (cacheDir != null) {
       effectiveCacheDir = cacheDir;
     } else {
-      final appDir = await getApplicationDocumentsDirectory();
-      effectiveCacheDir = path.join(appDir.path, 'cache');
+      if (kIsWeb) {
+        // On web, use in-memory cache only
+        effectiveCacheDir = '/tmp/cache'; // This won't be used on web
+      } else {
+        final appDir = await getApplicationDocumentsDirectory();
+        effectiveCacheDir = path.join(appDir.path, 'cache');
+      }
     }
 
-    await Directory(effectiveCacheDir).create(recursive: true);
+    if (!kIsWeb) {
+      await Directory(effectiveCacheDir).create(recursive: true);
+    }
+    
     return FileCache._(
       cacheDir: effectiveCacheDir,
       maxSizeMB: maxSizeMB,
@@ -203,6 +212,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<Uint8List>> get(String key) async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, always return cache miss
+      return const Failure(CacheError(message: 'Cache miss - web mode'));
+    }
+    
     try {
       final cacheFile = _getCacheFile(key);
       final metaFile = _getMetadataFile(key);
@@ -224,7 +238,7 @@ class FileCache extends Cache<Uint8List> {
       }
 
       final data = await cacheFile.readAsBytes();
-      return Success(data);
+      return Success(Uint8List.fromList(data));
     } catch (e) {
       return Failure(
           CacheError(message: 'Failed to read cache', originalError: e));
@@ -233,6 +247,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<void>> put(String key, Uint8List value, {Duration? ttl}) async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, return success but don't actually cache
+      return const Success(null);
+    }
+    
     try {
       final cacheFile = _getCacheFile(key);
       final metaFile = _getMetadataFile(key);
@@ -261,6 +280,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<void>> delete(String key) async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, return success
+      return const Success(null);
+    }
+    
     try {
       final cacheFile = _getCacheFile(key);
       final metaFile = _getMetadataFile(key);
@@ -281,6 +305,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<void>> clear() async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, return success
+      return const Success(null);
+    }
+    
     try {
       final cacheDir = Directory(_cacheDir);
       if (await cacheDir.exists()) {
@@ -335,17 +364,17 @@ class FileCache extends Cache<Uint8List> {
   Future<void> _cleanupOldEntries() async {
     try {
       final cacheDir = Directory(_cacheDir);
-      final files = <File>[];
+      final files = <FileSystemEntity>[];
 
       await for (final entity in cacheDir.list()) {
-        if (entity is File && entity.path.endsWith('.meta')) {
+        if (entity.path.endsWith('.meta')) {
           files.add(entity);
         }
       }
 
       // Sort by modification time (oldest first)
-      files
-          .sort((a, b) => a.lastModifiedSync().compareTo(b.lastModifiedSync()));
+      // Cast to File since we know these are .meta files
+      files.sort((a, b) => (a as File).lastModifiedSync().compareTo((b as File).lastModifiedSync()));
 
       // Remove oldest files until under limit
       for (final file in files) {
@@ -373,9 +402,9 @@ class FileCache extends Cache<Uint8List> {
 
       final now = DateTime.now();
       await for (final entity in cacheDir.list()) {
-        if (entity is File && entity.path.endsWith('.meta')) {
+        if (entity.path.endsWith('.meta')) {
           try {
-            final content = await entity.readAsString();
+            final content = await (entity as File).readAsString();
             final metadata = jsonDecode(content) as Map<String, dynamic>;
             final expiresAt = metadata['expiresAt'] != null
                 ? DateTime.parse(metadata['expiresAt'])
