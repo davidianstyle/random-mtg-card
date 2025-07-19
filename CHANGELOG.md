@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0 (2025-07-19)
+
+## What's Changed
+* feat: Add web platform support by @davidianstyle in https://github.com/davidianstyle/random-mtg-card/pull/18
+
+
+**Full Changelog**: https://github.com/davidianstyle/random-mtg-card/compare/random-mtg-card-v1.2.0...random-mtg-card-v1.3.0
+
 ## 1.2.0 (2025-07-17)
 
 ## What's Changed
