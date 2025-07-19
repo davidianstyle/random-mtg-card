@@ -5,8 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 
 // Conditional imports for different platforms
-import 'dart:io' if (dart.library.js) 'logger_web.dart';
-import 'package:path_provider/path_provider.dart' if (dart.library.js) 'logger_web.dart';
+import 'dart:io' if (dart.library.js) 'io_web_stubs.dart';
+import 'package:path_provider/path_provider.dart'
+    if (dart.library.js) 'io_web_stubs.dart';
 
 enum LogLevel {
   debug(0),
@@ -245,7 +246,7 @@ class FileLogHandler extends LogHandler {
       // File logging not supported on web
       return;
     }
-    
+
     final now = DateTime.now();
     final filename =
         'app_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}.log';

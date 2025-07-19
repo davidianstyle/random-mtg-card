@@ -1,19 +1,22 @@
 // Web stubs for dart:io functionality
-// This file provides empty implementations for web compatibility
+// Consolidated file to avoid duplication between cache_service and logger
+// This provides empty implementations for web compatibility
+
+import 'dart:typed_data';
 
 class File extends FileSystemEntity {
   @override
   final String path;
-  
+
   File(this.path);
-  
+
   @override
   Future<bool> exists() async => false;
   @override
   Future<int> length() async => 0;
   Future<void> writeAsBytes(List<int> bytes) async {}
   Future<void> writeAsString(String contents) async {}
-  Future<List<int>> readAsBytes() async => [];
+  Future<Uint8List> readAsBytes() async => Uint8List(0);
   @override
   Future<String> readAsString() async => '';
   @override
@@ -27,9 +30,9 @@ class File extends FileSystemEntity {
 class Directory extends FileSystemEntity {
   @override
   final String path;
-  
+
   const Directory(this.path);
-  
+
   @override
   Future<bool> exists() async => false;
   Future<Directory> create({bool recursive = false}) async => this;
@@ -65,4 +68,4 @@ class IOSink {
 // Stub for path_provider
 Future<Directory> getApplicationDocumentsDirectory() async {
   return const Directory('/tmp/docs');
-} 
+}

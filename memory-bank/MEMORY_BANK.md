@@ -687,4 +687,51 @@ flutter build web --release
 - **Challenge**: Managing different build artifacts and deployment processes
 - **Solution**: Clear documentation and separate build scripts
 
-This web compatibility implementation successfully transformed a Pi-specific desktop application into a truly cross-platform solution, solving hardware compatibility issues while preserving all architectural benefits and design patterns. 
+This web compatibility implementation successfully transformed a Pi-specific desktop application into a truly cross-platform solution, solving hardware compatibility issues while preserving all architectural benefits and design patterns.
+
+## Code Quality and Formatting Standards
+
+### Formatting Requirements for CI
+**CRITICAL**: Always run `dart format .` on the codebase after making changes to ensure CI passes.
+
+```bash
+# Format all Dart code in the project
+dart format .
+
+# Verify no formatting issues remain
+dart format . --output=none --set-exit-if-changed
+```
+
+**Why This Matters**:
+- ✅ **CI Compliance**: Automated checks will fail if code is not properly formatted
+- ✅ **Code Consistency**: Uniform formatting across all team members
+- ✅ **Review Quality**: Formatted code is easier to review and maintain
+- ✅ **Git Diffs**: Clean diffs that focus on logic changes, not formatting
+
+### Development Workflow
+1. **Make Code Changes**: Implement features/fixes
+2. **Run Analysis**: `flutter analyze` to catch static analysis issues  
+3. **Run Tests**: `flutter test test/unit` to ensure functionality
+4. **Format Code**: `dart format .` to ensure formatting compliance
+5. **Commit Changes**: Only after all checks pass
+
+### Additional Quality Tools
+```bash
+# Full quality check sequence
+flutter clean && flutter pub get
+flutter analyze
+flutter test test/unit
+dart format .
+flutter build web --release  # Verify build works
+```
+
+### Code Review Standards
+- **Type Safety**: Always use proper type checks (e.g., `entity is File`) before casting
+- **DRY Principle**: Avoid duplicate code - consolidate shared functionality
+- **Performance**: Avoid unnecessary object copies (e.g., `Uint8List.fromList()`)
+- **Web Compatibility**: Use consolidated stubs in `lib/utils/io_web_stubs.dart`
+
+### File Organization
+- **Web Stubs**: Consolidated in `lib/utils/io_web_stubs.dart` (single source of truth)
+- **Conditional Imports**: Use consistent pattern across services
+- **Type Safety**: Restore `is Type` checks when removed for quick fixes 
