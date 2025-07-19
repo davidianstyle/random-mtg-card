@@ -2,22 +2,52 @@
 
 Welcome to the comprehensive documentation for the Random MTG Card Display app. This directory contains all technical documentation, project summaries, and development guides.
 
+## 🌐 **Platform Support**
+
+This Flutter application supports multiple platforms:
+- ✅ **Raspberry Pi Desktop** (Primary target - native Linux app)
+- ✅ **Web Browsers** (Secondary target - solves Pi OpenGL issues)
+- ✅ **Desktop/Mobile** (Development and testing)
+
+### Quick Start - Web Deployment
+```bash
+# Build for web
+flutter build web --release
+
+# Serve locally
+cd build/web && python3 -m http.server 8080
+
+# Access at: http://localhost:8080
+```
+
+**📘 For complete deployment instructions**: [WEB_DEPLOYMENT_GUIDE.md](./WEB_DEPLOYMENT_GUIDE.md)
+
 ## 📚 Documentation Overview
+
+### 🚀 **[WEB_DEPLOYMENT_GUIDE.md](./WEB_DEPLOYMENT_GUIDE.md)** - **Web Deployment**
+Complete guide for deploying the Flutter web version:
+- **Quick Start**: 5-minute deployment guide
+- **Platform Comparison**: Native vs Web feature comparison
+- **Deployment Scenarios**: Pi local server, cloud hosting, Docker, traditional servers
+- **Build Optimization**: Performance tuning and size optimization
+- **Troubleshooting**: Common issues and solutions
 
 ### 🏗️ **[MEMORY_BANK.md](./MEMORY_BANK.md)** - **Primary Reference**
 The main technical documentation covering all enhanced features and architecture:
 - **Enhanced Architecture**: Result-based error handling, structured logging, dependency injection
-- **Performance Systems**: Caching layer, monitoring, circuit breaker patterns
+- **Performance Systems**: Caching layer, monitoring, circuit breaker patterns  
+- **Web Platform Compatibility**: Cross-platform implementation with conditional compilation
 - **Development Guides**: Setup, testing, debugging, troubleshooting
 - **Code Examples**: Implementation patterns and usage examples
 - **Performance Metrics**: Before/after comparisons and benchmarks
 
 ### 📖 **[PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)** - **Project Introduction**
 High-level overview of the project:
-- Project goals and vision
-- Target audience and use cases
-- Key features and capabilities
-- Technology stack and architecture decisions
+- **Platform Support**: Raspberry Pi and Web browser deployment options
+- **Project goals and vision**: Cross-platform MTG card display
+- **Target audience and use cases**: Pi enthusiasts and web users
+- **Key features and capabilities**: Gesture navigation, favorites, filtering
+- **Technology stack**: Flutter with cross-platform architecture
 
 ### 📊 **[PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md)** - **Executive Summary**
 Concise project summary for stakeholders:
@@ -28,10 +58,11 @@ Concise project summary for stakeholders:
 
 ### 🔧 **[TECHNICAL_SPECS.md](./TECHNICAL_SPECS.md)** - **Technical Specifications**
 Detailed technical specifications and requirements:
-- System requirements and dependencies
-- API specifications and integration details
-- Database schema and data models
-- Security considerations and compliance
+- **Multi-Platform Architecture**: Desktop, mobile, and web specifications
+- **Platform-Specific Implementations**: Conditional compilation patterns
+- **Build and Deployment**: Desktop and web build processes
+- **API specifications and integration details**: Scryfall API integration
+- **Security considerations**: Cross-platform security patterns
 
 ### 📋 **[FLUTTER_ANALYSIS.md](./FLUTTER_ANALYSIS.md)** - **Code Quality Analysis**
 Flutter-specific analysis and improvements:
@@ -42,124 +73,117 @@ Flutter-specific analysis and improvements:
 
 ## 🚀 Recent Enhancements (2024)
 
+### 🌐 **Web Platform Compatibility** (December 2024)
+**Major Achievement**: Cross-platform implementation solving Raspberry Pi OpenGL issues
+
+**Problem Solved**: 
+- Pi OpenGL context errors: `"Unable to create a GL context"`
+- Graphics driver compatibility issues
+- Hardware-specific deployment limitations
+
+**Solution Implemented**:
+- ✅ **Conditional Compilation**: Platform-aware service implementations
+- ✅ **Web Stub Classes**: File system operation fallbacks for browsers
+- ✅ **Unified APIs**: Same interfaces across desktop and web
+- ✅ **Deployment Flexibility**: Choose native or web deployment on Pi
+
+**Benefits**:
+- 🔧 **Fallback Solution**: Web version when desktop app fails
+- 🌍 **Remote Access**: Access from any device via browser
+- ⚡ **Easy Testing**: Develop and test on any machine
+- 📦 **Zero Installation**: No native app installation required
+
 ### Major Technical Improvements
 The project has undergone significant architectural enhancements transforming it from a basic prototype to a production-ready application:
 
 #### 🔄 **Error Handling Revolution**
 - **Before**: Basic null checks and simple error strings
 - **After**: Type-safe Result<T> system with sealed classes
-- **Impact**: 87% reduction in runtime errors, explicit error handling
 
-#### 📊 **Comprehensive Logging**
-- **Before**: Basic debugPrint statements
-- **After**: Structured logging with file rotation and levels
-- **Impact**: Improved debugging, production monitoring, log analysis
+```dart
+// Old approach
+MTGCard? card = await scryfallService.getRandomCard();
+if (card != null) { /* handle success */ }
 
-#### 🏗️ **Dependency Injection**
-- **Before**: Tight coupling with direct instantiation
-- **After**: Service locator pattern with lifecycle management
-- **Impact**: Better testability, loose coupling, modular design
+// New approach  
+final result = await scryfallService.getRandomCardResult();
+result.fold(
+  (card) => displayCard(card),
+  (error) => handleError(error),
+);
+```
 
-#### 🚀 **Performance Optimization**
-- **Before**: No caching, repeated API calls
-- **After**: Two-tier caching (memory + disk) with intelligent TTL
-- **Impact**: 80% reduction in API calls, 60% faster image loading
+#### 🏗️ **Service Architecture Enhancement**
+- **Before**: Direct service instantiation and tight coupling
+- **After**: Dependency injection with service locator pattern
 
-#### 📈 **Real-time Monitoring**
+```dart
+// Old approach
+final scryfallService = ScryfallService();
+
+// New approach
+final scryfallService = getService<ScryfallService>();
+```
+
+#### 📊 **Performance Monitoring Integration**
 - **Before**: No performance tracking
-- **After**: Comprehensive metrics collection with alerts
-- **Impact**: Proactive issue detection, performance insights
+- **After**: Real-time metrics with alerting thresholds
 
-#### 🔧 **Enhanced API Service**
-- **Before**: Basic HTTP requests with simple retry
-- **After**: Circuit breaker pattern with exponential backoff
-- **Impact**: Better resilience, graceful degradation
+```dart
+// Automatic performance tracking
+final result = await timeAsync('getRandomCard', () async {
+  return scryfallService.getRandomCardResult();
+});
+```
 
-## 📈 Performance Metrics
+#### 🗄️ **Advanced Caching System**
+- **Before**: Simple in-memory cache
+- **After**: Two-tier caching (memory + disk) with LRU and TTL
+- **Web Adaptation**: Memory-only caching for browser compatibility
 
-### Before vs After Enhancement
-| Metric | Before | After | Improvement |
-|--------|---------|-------|-------------|
-| API Calls per Session | ~100 | ~20 | 80% reduction |
-| Image Load Time | 2-3 seconds | 0.5-1 second | 60% improvement |
-| Memory Usage | ~200MB | ~120MB | 40% reduction |
-| Error Rate | ~15% | ~2% | 87% improvement |
-| Test Coverage | ~60% | ~90% | 50% improvement |
+## 🔗 Cross-References
 
-## 🛠️ Quick Start Guide
-
-### For Developers
-1. **Clone and Setup**:
-   ```bash
-   git clone <repository>
-   cd random-mtg-card
-   flutter pub get
-   ```
-
-2. **Run Development Build**:
-   ```bash
-   ./scripts/dev_run.sh
-   ```
-
-3. **Run Tests**:
-   ```bash
-   flutter test --coverage
-   ```
-
-### For Contributors
-1. **Read Documentation**: Start with [MEMORY_BANK.md](./MEMORY_BANK.md)
-2. **Follow Conventions**: Use conventional commits and proper formatting
-3. **Test Thoroughly**: Maintain 90%+ test coverage
-4. **Review Code Quality**: Run `flutter analyze` before submitting
-
-## 🔍 Find What You Need
-
-### 🆘 **Troubleshooting**
-- **Service Issues**: Check [MEMORY_BANK.md](./MEMORY_BANK.md) → Troubleshooting Guide
-- **Build Problems**: See [TECHNICAL_SPECS.md](./TECHNICAL_SPECS.md) → Build Requirements
-- **Performance Issues**: Review [MEMORY_BANK.md](./MEMORY_BANK.md) → Performance Monitoring
-
-### 💡 **Implementation Examples**
-- **Error Handling**: [MEMORY_BANK.md](./MEMORY_BANK.md) → Result-Based Error Handling
-- **Logging**: [MEMORY_BANK.md](./MEMORY_BANK.md) → Structured Logging System
-- **Caching**: [MEMORY_BANK.md](./MEMORY_BANK.md) → Comprehensive Caching Layer
-
-### 📚 **Architecture Understanding**
-- **High-Level Overview**: [PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md)
-- **Technical Deep Dive**: [MEMORY_BANK.md](./MEMORY_BANK.md)
-- **Specifications**: [TECHNICAL_SPECS.md](./TECHNICAL_SPECS.md)
-
-## 📅 Documentation Updates
-
-### Latest Updates
-- **Enhanced Architecture Documentation**: Complete rewrite covering all new systems
-- **Performance Metrics**: Comprehensive before/after analysis
-- **Implementation Guides**: Detailed code examples and patterns
-- **Troubleshooting**: Expanded debugging and problem-solving guides
-
-### Maintenance Schedule
-- **Weekly**: Performance metrics updates
-- **Monthly**: Architecture review and documentation refresh
-- **Quarterly**: Comprehensive technical specification review
-
-## 🎯 Key Takeaways
-
-### For Stakeholders
-- **Production Ready**: Transformed from prototype to enterprise-grade application
-- **Performance**: Significant improvements in speed, reliability, and user experience
-- **Maintainability**: Clean architecture supporting future enhancements
-- **Quality**: 90%+ test coverage with comprehensive monitoring
+### For Deployment
+- **🚀 Complete Web Deployment**: [WEB_DEPLOYMENT_GUIDE.md](./WEB_DEPLOYMENT_GUIDE.md)
+- **Pi Native Deployment**: [TECHNICAL_SPECS.md - Desktop Build](./TECHNICAL_SPECS.md#desktop-build-linuxpi)
+- **Pi Web Deployment**: [WEB_DEPLOYMENT_GUIDE.md - Pi Local Server](./WEB_DEPLOYMENT_GUIDE.md#1-raspberry-pi-local-web-server)
+- **Cloud Deployment**: [WEB_DEPLOYMENT_GUIDE.md - Cloud Static Hosting](./WEB_DEPLOYMENT_GUIDE.md#2-cloud-static-hosting)
+- **Docker Deployment**: [WEB_DEPLOYMENT_GUIDE.md - Docker Container](./WEB_DEPLOYMENT_GUIDE.md#3-docker-container)
 
 ### For Developers
-- **Modern Architecture**: Implements industry best practices for Flutter development
-- **Comprehensive Documentation**: Complete guides for all systems and features
-- **Development Tools**: Enhanced debugging, monitoring, and testing capabilities
-- **Reference Implementation**: Can serve as template for similar projects
+- **Setup Guide**: [MEMORY_BANK.md - Development Setup](./MEMORY_BANK.md#development-setup)
+- **Architecture Deep Dive**: [MEMORY_BANK.md - Enhanced Architecture](./MEMORY_BANK.md#enhanced-architecture-details)
+- **Testing Guide**: [MEMORY_BANK.md - Testing Strategy](./MEMORY_BANK.md#testing-strategy)
+- **Web Platform Details**: [MEMORY_BANK.md - Web Platform Compatibility](./MEMORY_BANK.md#web-platform-compatibility-implementation)
 
----
+### For Troubleshooting
+- **Web Deployment Issues**: [WEB_DEPLOYMENT_GUIDE.md - Troubleshooting](./WEB_DEPLOYMENT_GUIDE.md#troubleshooting)
+- **Common Issues**: [MEMORY_BANK.md - Troubleshooting](./MEMORY_BANK.md#troubleshooting-guide)
+- **Platform Issues**: [TECHNICAL_SPECS.md - Platform-Specific Issues](./TECHNICAL_SPECS.md#platform-specific-issues)
+- **Performance Problems**: [MEMORY_BANK.md - Performance Issues](./MEMORY_BANK.md#performance-issues)
 
-**Last Updated**: $(date)
-**Version**: 3.0 (Enhanced Architecture)
-**Status**: Production Ready
+## 🎯 Quick Navigation by Use Case
 
-For questions or suggestions about the documentation, please refer to the [CONTRIBUTING.md](../CONTRIBUTING.md) file in the project root. 
+### "I want to deploy on Raspberry Pi"
+1. **First try**: [Native Linux deployment](./TECHNICAL_SPECS.md#desktop-build-linuxpi)
+2. **If OpenGL issues**: [Web deployment fallback](./WEB_DEPLOYMENT_GUIDE.md#1-raspberry-pi-local-web-server)
+3. **Troubleshooting**: [Platform-specific issues](./TECHNICAL_SPECS.md#platform-specific-issues)
+
+### "I want to deploy to the web"
+1. **Quick start**: [5-minute deployment](./WEB_DEPLOYMENT_GUIDE.md#quick-start)
+2. **Cloud hosting**: [Firebase, Netlify, Vercel options](./WEB_DEPLOYMENT_GUIDE.md#2-cloud-static-hosting)
+3. **Traditional servers**: [Apache/Nginx configuration](./WEB_DEPLOYMENT_GUIDE.md#4-apachenginx-static-hosting)
+4. **Performance optimization**: [Build optimization guide](./WEB_DEPLOYMENT_GUIDE.md#build-optimization)
+
+### "I want to understand the architecture"
+1. **Start**: [Project Overview](./PROJECT_OVERVIEW.md#current-implementation-flutter)
+2. **Deep dive**: [Memory Bank - Architecture](./MEMORY_BANK.md#enhanced-architecture-details)
+3. **Technical details**: [Technical Specs - Cross-Platform](./TECHNICAL_SPECS.md#cross-platform-implementation)
+
+### "I want to contribute/modify the code"
+1. **Setup**: [Development environment](./MEMORY_BANK.md#development-setup)
+2. **Architecture**: [Service patterns](./MEMORY_BANK.md#dependency-injection-system)
+3. **Testing**: [Testing strategy](./MEMORY_BANK.md#testing-strategy)
+4. **Quality**: [Flutter analysis](./FLUTTER_ANALYSIS.md)
+
+This documentation provides complete coverage of a production-ready Flutter application with enterprise-grade architecture, cross-platform compatibility, and comprehensive operational features. 

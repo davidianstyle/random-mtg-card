@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
+
+// Conditional imports for different platforms
+import 'dart:io' if (dart.library.js) 'io_web_stubs.dart';
+import 'package:path_provider/path_provider.dart'
+    if (dart.library.js) 'io_web_stubs.dart';
 
 enum LogLevel {
   debug(0),
@@ -221,16 +224,29 @@ class FileLogHandler extends LogHandler {
     int maxFiles = 5,
     int maxSizeMB = 10,
   }) async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final logDir = path.join(appDir.path, 'logs');
-    await Directory(logDir).create(recursive: true);
+    final String logDir;
+    if (kIsWeb) {
+      // On web, use a dummy path since file logging isn't supported
+      logDir = '/tmp/logs';
+    } else {
+      final appDir = await getApplicationDocumentsDirectory();
+      logDir = path.join(appDir.path, 'logs');
+      await Directory(logDir).create(recursive: true);
+    }
 
     final handler = FileLogHandler._(logDir, maxFiles, maxSizeMB);
-    await handler._initializeLogFile();
+    if (!kIsWeb) {
+      await handler._initializeLogFile();
+    }
     return handler;
   }
 
   Future<void> _initializeLogFile() async {
+    if (kIsWeb) {
+      // File logging not supported on web
+      return;
+    }
+
     final now = DateTime.now();
     final filename =
         'app_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}.log';
@@ -286,7 +302,9 @@ class FileLogHandler extends LogHandler {
 
   @override
   void handle(LogEntry entry) {
-    _logSink?.writeln(jsonEncode(entry.toJson()));
+    if (!kIsWeb) {
+      _logSink?.writeln(jsonEncode(entry.toJson()));
+    }
   }
 
   @override

@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import '../utils/logger.dart';
 import '../utils/result.dart';
+
+// Conditional imports for different platforms
+import 'dart:io' if (dart.library.js) '../utils/io_web_stubs.dart';
+import 'package:path_provider/path_provider.dart'
+    if (dart.library.js) '../utils/io_web_stubs.dart';
 
 // Cache entry with metadata
 class CacheEntry<T> {
@@ -173,11 +175,19 @@ class FileCache extends Cache<Uint8List> {
     if (cacheDir != null) {
       effectiveCacheDir = cacheDir;
     } else {
-      final appDir = await getApplicationDocumentsDirectory();
-      effectiveCacheDir = path.join(appDir.path, 'cache');
+      if (kIsWeb) {
+        // On web, use in-memory cache only
+        effectiveCacheDir = '/tmp/cache'; // This won't be used on web
+      } else {
+        final appDir = await getApplicationDocumentsDirectory();
+        effectiveCacheDir = path.join(appDir.path, 'cache');
+      }
     }
 
-    await Directory(effectiveCacheDir).create(recursive: true);
+    if (!kIsWeb) {
+      await Directory(effectiveCacheDir).create(recursive: true);
+    }
+
     return FileCache._(
       cacheDir: effectiveCacheDir,
       maxSizeMB: maxSizeMB,
@@ -203,6 +213,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<Uint8List>> get(String key) async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, always return cache miss
+      return const Failure(CacheError(message: 'Cache miss - web mode'));
+    }
+
     try {
       final cacheFile = _getCacheFile(key);
       final metaFile = _getMetadataFile(key);
@@ -233,6 +248,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<void>> put(String key, Uint8List value, {Duration? ttl}) async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, return success but don't actually cache
+      return const Success(null);
+    }
+
     try {
       final cacheFile = _getCacheFile(key);
       final metaFile = _getMetadataFile(key);
@@ -261,6 +281,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<void>> delete(String key) async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, return success
+      return const Success(null);
+    }
+
     try {
       final cacheFile = _getCacheFile(key);
       final metaFile = _getMetadataFile(key);
@@ -281,6 +306,11 @@ class FileCache extends Cache<Uint8List> {
 
   @override
   Future<Result<void>> clear() async {
+    if (kIsWeb) {
+      // Web doesn't support file caching, return success
+      return const Success(null);
+    }
+
     try {
       final cacheDir = Directory(_cacheDir);
       if (await cacheDir.exists()) {
